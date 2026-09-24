@@ -53,21 +53,6 @@ The resume layout is structured simply and practically:
 
 ---
 
-## 🌐 Deploy to GitHub Pages
-
-1. Create a new repository on GitHub (e.g. `resu-maker`).
-2. Push your files to the `main` branch:
-   ```bash
-   git remote add origin https://github.com/<your-username>/resu-maker.git
-   git branch -M main
-   git push -u origin main
-   ```
-3. Go to repository **Settings** > **Pages**.
-4. Under **Source**, select **Deploy from a branch**.
-5. Set the branch to **`main`** and folder to **`/ (root)`**, then click **Save**.
-
----
-
 ## 👤 Author
 
 * **Created by:** DNL
