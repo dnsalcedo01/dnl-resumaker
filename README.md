@@ -4,7 +4,7 @@ A simple, lightweight single-page resume maker created for IT students, beginner
 
 ---
 
-![Resu-maker Homepage/Editor](Resu-maker_home_demo.jpeg)
+![Resu-maker Homepage/Editor](Resu-maker_editor_home.jpeg)
 **Resu-maker Homepage/Editor**
 
 ## 📌 About
