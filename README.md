@@ -4,6 +4,9 @@ A simple, lightweight single-page resume maker created for IT students, beginner
 
 ---
 
+![Resu-maker Homepage/Editor](Resu-maker_home_demo.jpeg)
+**Resu-maker Homepage/Editor**
+
 ## 📌 About
 
 **Resu-maker by DNL** is a simple, browser-based resume editor. It is designed to help you create a single-page A4 resume without complicated tools or subscriptions. 
