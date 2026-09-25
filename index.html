@@ -30,8 +30,8 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button id="actions-modal-open-btn" class="header-menu-btn" title="Open Resume Actions & Options">
-                        <i class="fas fa-sliders-h"></i> Actions
+                    <button id="actions-modal-open-btn" class="header-menu-btn" title="Open Resume Menu">
+                        <i class="fas fa-bars"></i> Menu
                     </button>
                 </div>
             </div>
@@ -40,7 +40,9 @@
             <div class="document-meta-bar">
                 <div class="doc-title-wrapper">
                     <i class="fas fa-file-alt doc-title-icon" title="Resume Document Title"></i>
-                    <input type="text" id="document-title-input" class="doc-title-input" value="Alex Morgan - Resume" placeholder="Resume Document Name" title="Document Name (used for saving and PDF export filename)">
+                    <input type="text" id="document-title-input" class="doc-title-input" value="Alex Morgan - Resume"
+                        placeholder="Resume Document Name"
+                        title="Document Name (used for saving and PDF export filename)">
                 </div>
                 <span class="save-status-indicator" id="save-status-indicator" title="Storage Status">
                     <i class="fas fa-check-circle"></i> Saved
@@ -110,12 +112,26 @@
         <div class="modal-box actions-modal-box">
             <div class="modal-header">
                 <div class="modal-title">
-                    <i class="fas fa-sliders-h" style="color: var(--primary-color);"></i> Resume Actions & Options
+                    <i class="fas fa-bars" style="color: var(--primary-color);"></i> Resume Menu
                 </div>
                 <button type="button" class="modal-close-btn" id="actions-modal-close">&times;</button>
             </div>
             <div class="actions-modal-grid">
-                <!-- 1. Save to Storage -->
+                <!-- 1. New Resume / Format -->
+                <div class="action-card" id="card-reset-default">
+                    <div class="action-card-icon new-doc-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="action-card-info">
+                        <h4>New Resume Format</h4>
+                        <p>Start a new document with a clean blank format, or reload the sample template.</p>
+                    </div>
+                    <button type="button" class="action-btn text-muted-btn" id="reset-default-btn">
+                        <i class="fas fa-plus"></i> New...
+                    </button>
+                </div>
+
+                <!-- 2. Save to Storage -->
                 <div class="action-card" id="card-save-storage">
                     <div class="action-card-icon save-icon">
                         <i class="fas fa-save"></i>
@@ -129,7 +145,7 @@
                     </button>
                 </div>
 
-                <!-- 2. Open Document / PDF -->
+                <!-- 3. Open Document / PDF -->
                 <div class="action-card" id="card-open-pdf">
                     <div class="action-card-icon open-pdf-icon">
                         <i class="fas fa-folder-open"></i>
@@ -143,7 +159,7 @@
                     </button>
                 </div>
 
-                <!-- 3. Save as PDF -->
+                <!-- 4. Save as PDF -->
                 <div class="action-card" id="card-export-pdf">
                     <div class="action-card-icon export-pdf-icon">
                         <i class="fas fa-file-pdf"></i>
@@ -157,7 +173,7 @@
                     </button>
                 </div>
 
-                <!-- 4. Export Project File (.json) -->
+                <!-- 5. Export Project File (.json) -->
                 <div class="action-card" id="card-export-json">
                     <div class="action-card-icon export-json-icon">
                         <i class="fas fa-file-export"></i>
@@ -166,24 +182,12 @@
                         <h4>Export Project Backup</h4>
                         <p>Download full resume project data (.json) to save on your computer.</p>
                     </div>
-                    <button type="button" class="action-btn" id="export-json-btn" style="background:#e0e7ff; color:#3730a3;">
+                    <button type="button" class="action-btn" id="export-json-btn"
+                        style="background:#e0e7ff; color:#3730a3;">
                         <i class="fas fa-file-export"></i> Export File
                     </button>
                 </div>
 
-                <!-- 5. Reset Resume -->
-                <div class="action-card" id="card-reset-default">
-                    <div class="action-card-icon reset-icon">
-                        <i class="fas fa-undo"></i>
-                    </div>
-                    <div class="action-card-info">
-                        <h4>Reset to Blank Template</h4>
-                        <p>Clear filled content and logos, revert photo, and keep a clean structured template.</p>
-                    </div>
-                    <button type="button" class="action-btn text-muted-btn" id="reset-default-btn">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
-                </div>
             </div>
             <div class="modal-footer"
                 style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
@@ -201,7 +205,7 @@
                 </div>
                 <button type="button" class="modal-close-btn" id="open-doc-modal-close">&times;</button>
             </div>
-            
+
             <div class="open-doc-tabs">
                 <button type="button" class="open-doc-tab active" id="tab-btn-saved">
                     <i class="fas fa-database"></i> Saved in Browser (<span id="saved-docs-count">0</span>)
@@ -221,7 +225,8 @@
                         <i class="fas fa-search"></i>
                         <input type="text" id="saved-docs-search" placeholder="Search saved resumes by name...">
                     </div>
-                    <button type="button" class="action-btn save-copy-btn" id="save-new-copy-btn" title="Save current resume as a new document">
+                    <button type="button" class="action-btn save-copy-btn" id="save-new-copy-btn"
+                        title="Save current resume as a new document">
                         <i class="fas fa-plus"></i> Save as New Copy
                     </button>
                 </div>
@@ -235,7 +240,8 @@
                 <div class="import-dropzone" id="import-dropzone">
                     <i class="fas fa-cloud-upload-alt import-icon"></i>
                     <h3>Select or Drop a Resume Project File (.json / .resume)</h3>
-                    <p>Load an exported resume project file to restore full editable content, photos, and signatures, or select a PDF file to open in viewer.</p>
+                    <p>Load an exported resume project file to restore full editable content, photos, and signatures, or
+                        select a PDF file to open in viewer.</p>
                     <div class="import-actions">
                         <button type="button" class="primary-btn" id="import-browse-btn">
                             <i class="fas fa-folder-open"></i> Choose File...
@@ -250,14 +256,17 @@
                 <div class="pdf-tab-intro">
                     <div class="pdf-tab-icon"><i class="fas fa-file-pdf"></i></div>
                     <h3>Standalone PDF Print Window</h3>
-                    <p>Open the current resume in a separate distraction-free browser window configured with strict A4 dimensions and one-click PDF print/save.</p>
-                    <button type="button" class="primary-btn" id="open-standalone-pdf-window-btn" style="padding: 10px 20px; font-size: 14px;">
+                    <p>Open the current resume in a separate distraction-free browser window configured with strict A4
+                        dimensions and one-click PDF print/save.</p>
+                    <button type="button" class="primary-btn" id="open-standalone-pdf-window-btn"
+                        style="padding: 10px 20px; font-size: 14px;">
                         <i class="fas fa-external-link-alt"></i> Open Standalone PDF Preview
                     </button>
                 </div>
             </div>
 
-            <div class="modal-footer" style="margin-top: 18px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+            <div class="modal-footer"
+                style="margin-top: 18px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
                 <button type="button" class="btn-secondary" id="open-doc-modal-cancel">Close</button>
             </div>
         </div>
@@ -271,12 +280,14 @@
                 <button type="button" class="modal-close-btn" id="pdf-guide-close">&times;</button>
             </div>
             <div class="guide-content">
-                <p>To ensure your PDF is an <strong>exact replica</strong> with crisp colors and zero extra margins, please verify your browser print settings:</p>
+                <p>To ensure your PDF is an <strong>exact replica</strong> with crisp colors and zero extra margins,
+                    please verify your browser print settings:</p>
                 <ul class="guide-list">
                     <li><i class="fas fa-check text-green"></i> <strong>Destination:</strong> Save as PDF</li>
                     <li><i class="fas fa-check text-green"></i> <strong>Paper size:</strong> A4</li>
                     <li><i class="fas fa-check text-green"></i> <strong>Margins:</strong> None</li>
-                    <li><i class="fas fa-check text-green"></i> <strong>Options:</strong> Enable <u>Background graphics</u></li>
+                    <li><i class="fas fa-check text-green"></i> <strong>Options:</strong> Enable <u>Background
+                            graphics</u></li>
                 </ul>
             </div>
             <div class="modal-footer">
@@ -287,33 +298,35 @@
         </div>
     </div>
 
-    <!-- Template Reset Confirmation Modal -->
+    <!-- New Resume / Format Selection Modal -->
     <div id="reset-confirm-modal" class="modal-backdrop hide-on-print" style="display: none;">
-        <div class="modal-box modal-guide" style="max-width: 450px;">
+        <div class="modal-box modal-guide" style="max-width: 470px;">
             <div class="modal-header">
-                <div class="modal-title" style="color: #2563eb;"><i class="fas fa-undo"></i> Reset to Blank Template
+                <div class="modal-title" style="color: #2563eb;">
+                    <i class="fas fa-file-alt"></i> New Resume Format
                 </div>
                 <button type="button" class="modal-close-btn" id="reset-modal-close">&times;</button>
             </div>
             <div class="guide-content">
-                <p style="font-size: 13.5px; color: #1e293b; margin-bottom: 8px; font-weight: 500;">
-                    Reset all content to a <strong>blank template</strong>?
+                <p style="font-size: 13.5px; color: #1e293b; margin-bottom: 6px; font-weight: 500;">
+                    Choose how you would like to start your new resume:
                 </p>
-                <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 18px;">
-                    This clears filled-out text, removes custom school/organization logos, reverts the photo to default avatar, and provides a clean structured template with helpful guide placeholders.
+                <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+                    Your current resume remains safely saved in your browser history and can be reopened anytime from
+                    <strong>Menu &gt; Open Resume / PDF</strong>.
                 </p>
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" class="btn-secondary" id="reset-modal-cancel">Cancel</button>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
                     <button type="button" class="primary-btn" id="reset-modal-confirm-blank"
-                        style="padding:7px 14px; font-weight:600;">
-                        <i class="fas fa-undo"></i> Reset to Blank Template
+                        style="padding: 10px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-file"></i> Start with Clean Blank Format
+                    </button>
+                    <button type="button" class="action-btn text-muted-btn" id="reset-modal-restore-template"
+                        style="padding: 10px 14px; font-size: 13px; font-weight: 500; color: #1e40af; border-color: #bfdbfe; background: #eff6ff; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-user-edit"></i> Load Sample Template (Alex Morgan)
                     </button>
                 </div>
-                <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center;">
-                    <button type="button" id="reset-modal-restore-template"
-                        style="background:none; border:none; color:#2563eb; font-size:11.5px; cursor:pointer; text-decoration:underline;">
-                        <i class="fas fa-history"></i> Or restore sample template
-                    </button>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" id="reset-modal-cancel">Cancel</button>
                 </div>
             </div>
         </div>

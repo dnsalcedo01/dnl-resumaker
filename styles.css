@@ -1669,9 +1669,10 @@ body {
     color: #4f46e5;
 }
 
-.action-card-icon.reset-icon {
+.action-card-icon.reset-icon,
+.action-card-icon.new-doc-icon {
     background: #f1f5f9;
-    color: #64748b;
+    color: #475569;
 }
 
 .action-card-info {
