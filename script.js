@@ -911,13 +911,17 @@ function closeResetModal() {
 function executeResetToBlank() {
     backupBeforeReset = JSON.parse(JSON.stringify(state));
     state = JSON.parse(JSON.stringify(BLANK_STATE));
+    state.id = 'doc_' + Date.now();
+    state.documentTitle = 'Untitled Resume';
+    updateDocumentTitleUI();
     saveToLocalStorage(false);
     renderEditor();
     renderPreview();
     closeResetModal();
-    showToast('Resume reset to blank format!', false, () => {
+    showToast('Created new blank resume!', false, () => {
         if (backupBeforeReset) {
             state = JSON.parse(JSON.stringify(backupBeforeReset));
+            updateDocumentTitleUI();
             saveToLocalStorage(false);
             renderEditor();
             renderPreview();
@@ -929,13 +933,17 @@ function executeResetToBlank() {
 function executeRestoreTemplate() {
     backupBeforeReset = JSON.parse(JSON.stringify(state));
     state = JSON.parse(JSON.stringify(defaultState));
+    state.id = 'doc_' + Date.now();
+    state.documentTitle = 'Alex Morgan - Resume';
+    updateDocumentTitleUI();
     saveToLocalStorage(false);
     renderEditor();
     renderPreview();
     closeResetModal();
-    showToast('Original sample template restored!', false, () => {
+    showToast('Loaded sample template (Alex Morgan)!', false, () => {
         if (backupBeforeReset) {
             state = JSON.parse(JSON.stringify(backupBeforeReset));
+            updateDocumentTitleUI();
             saveToLocalStorage(false);
             renderEditor();
             renderPreview();

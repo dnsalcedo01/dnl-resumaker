@@ -47,7 +47,7 @@ The resume layout is structured simply and practically:
 
 ## 📄 How to Save as PDF
 
-1. Click **Actions** > **Save as PDF** (or press `Ctrl + P`).
+1. Click **Menu** > **Save as PDF** (or press `Ctrl + P`).
 2. Set **Destination:** `Save as PDF`.
 3. Set **Paper size:** `A4`.
 4. Set **Margins:** `None` (or `Default`).
