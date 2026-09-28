@@ -116,7 +116,7 @@ const ICON_LIST = [
  */
 const defaultState = {
     id: "doc_default_sample",
-    documentTitle: "Alex Morgan - Resume",
+    documentTitle: "Sample Resume",
     backgroundPattern: "dots",
     personal: {
         name: "Alex Morgan",
@@ -132,20 +132,20 @@ const defaultState = {
     },
     summary: "Dedicated IT Systems Specialist with foundational experience in hardware diagnostics, network troubleshooting, and cloud infrastructure operations. Proven ability to resolve end-user technical issues promptly while optimizing workstation deployment and automation workflows. Passionate about system administration, security fundamentals, and collaborative technical support.",
     education: [
-        { 
-            id: "e1", 
-            title: "Bachelor of Science - Information Technology", 
-            institution: "Metropolitan State University", 
-            date: "09/2020 - 05/2024", 
+        {
+            id: "e1",
+            title: "Bachelor of Science - Information Technology",
+            institution: "Metropolitan State University",
+            date: "09/2020 - 05/2024",
             location: "San Francisco, CA",
             logoType: "crest",
             logoUrl: ""
         },
-        { 
-            id: "e2", 
-            title: "High School Diploma - STEM Track", 
-            institution: "Bay Area Preparatory Academy", 
-            date: "08/2016 - 06/2020", 
+        {
+            id: "e2",
+            title: "High School Diploma - STEM Track",
+            institution: "Bay Area Preparatory Academy",
+            date: "08/2016 - 06/2020",
             location: "San Francisco, CA",
             logoType: "badge",
             logoUrl: ""
@@ -153,32 +153,32 @@ const defaultState = {
     ],
     volunteeringTitle: "Work Experience",
     volunteering: [
-        { 
-            id: "v1", 
-            title: "IT Systems Support Intern", 
-            organization: "Apex Technology Solutions", 
-            date: "06/2024 - 01/2025", 
-            location: "San Francisco, CA (Hybrid)", 
+        {
+            id: "v1",
+            title: "IT Systems Support Intern",
+            organization: "Apex Technology Solutions",
+            date: "06/2024 - 01/2025",
+            location: "San Francisco, CA (Hybrid)",
             description: "Provided Tier 1 and Tier 2 IT support across Windows and macOS workstations.\n- Resolved hardware, network connectivity, and operating system issues for 150+ staff members.\n- Configured virtual machines, user directory accounts, and automated routine software installations.\n- Assisted network administrators in monitoring switch infrastructure and router endpoints.",
             logoType: "globe",
             logoUrl: ""
         }
     ],
     training: [
-        { 
-            id: "t1", 
-            title: "CompTIA Security+ Certification", 
-            institution: "Certificate of Achievement, **CompTIA**" 
+        {
+            id: "t1",
+            title: "CompTIA Security+ Certification",
+            institution: "Certificate of Achievement, **CompTIA**"
         },
-        { 
-            id: "t2", 
-            title: "AWS Certified Cloud Practitioner", 
-            institution: "Certificate of Completion, **Amazon Web Services (AWS)**" 
+        {
+            id: "t2",
+            title: "AWS Certified Cloud Practitioner",
+            institution: "Certificate of Completion, **Amazon Web Services (AWS)**"
         },
-        { 
-            id: "t3", 
-            title: "Google IT Support Professional Certificate", 
-            institution: "Professional Specialization, **Coursera / Google**" 
+        {
+            id: "t3",
+            title: "Google IT Support Professional Certificate",
+            institution: "Professional Specialization, **Coursera / Google**"
         }
     ],
     skills: [
@@ -196,37 +196,37 @@ const defaultState = {
         { id: "s12", name: "Customer & User Support" }
     ],
     interests: [
-        { 
-            id: "i1", 
-            title: "Cloud Architecture & Homelabs", 
-            icon: "fas fa-server", 
-            description: "Active interest in self-hosted home lab setups, virtualization with Proxmox, and exploring distributed cloud architectures." 
+        {
+            id: "i1",
+            title: "Cloud Architecture & Homelabs",
+            icon: "fas fa-server",
+            description: "Active interest in self-hosted home lab setups, virtualization with Proxmox, and exploring distributed cloud architectures."
         },
-        { 
-            id: "i2", 
-            title: "Automation & Modern Tech", 
-            icon: "fas fa-robot", 
-            description: "Enthusiastic about workflow automation, shell scripting, and leveraging AI tools to optimize productivity." 
+        {
+            id: "i2",
+            title: "Automation & Modern Tech",
+            icon: "fas fa-robot",
+            description: "Enthusiastic about workflow automation, shell scripting, and leveraging AI tools to optimize productivity."
         }
     ],
     projects: [
-        { 
-            id: "p1", 
-            title: "CloudDesk Portal", 
-            icon: "far fa-window-maximize", 
-            description: "Developed a web-based service desk application for managing hardware and software support tickets." 
+        {
+            id: "p1",
+            title: "CloudDesk Portal",
+            icon: "far fa-window-maximize",
+            description: "Developed a web-based service desk application for managing hardware and software support tickets."
         },
-        { 
-            id: "p2", 
-            title: "NetMonitor Dashboard", 
-            icon: "fas fa-network-wired", 
-            description: "Created a lightweight monitoring dashboard displaying local network ping latency and server uptime metrics." 
+        {
+            id: "p2",
+            title: "NetMonitor Dashboard",
+            icon: "fas fa-network-wired",
+            description: "Created a lightweight monitoring dashboard displaying local network ping latency and server uptime metrics."
         },
-        { 
-            id: "p3", 
-            title: "SecureDrop Transfer", 
-            icon: "fas fa-paper-plane", 
-            description: "Built an internal file-sharing web service with secure authentication and encrypted transfers." 
+        {
+            id: "p3",
+            title: "SecureDrop Transfer",
+            icon: "fas fa-paper-plane",
+            description: "Built an internal file-sharing web service with secure authentication and encrypted transfers."
         }
     ],
     signature: {
@@ -261,21 +261,21 @@ const BLANK_TEMPLATE_STATE = {
     },
     summary: "",
     education: [
-        { 
-            id: "edu_tmpl_1", 
-            title: "", 
-            institution: "", 
-            date: "", 
+        {
+            id: "edu_tmpl_1",
+            title: "",
+            institution: "",
+            date: "",
             location: "",
             logoUrl: ""
         }
     ],
     volunteering: [
-        { 
-            id: "vol_tmpl_1", 
-            title: "", 
-            organization: "", 
-            date: "", 
+        {
+            id: "vol_tmpl_1",
+            title: "",
+            organization: "",
+            date: "",
             location: "",
             description: "",
             logoUrl: ""
@@ -616,7 +616,7 @@ async function saveToLocalStorage(showAlert = true) {
  */
 async function getAllSavedDocuments() {
     let docs = await getAllFromDB(DB_STORE_DOCUMENTS);
-    
+
     // Auto-migration: if catalog is empty but legacy cache exists, import it as first document
     if (!docs || docs.length === 0) {
         let legacy = await loadFromDB(DB_STORE_CACHE, 'current_resume');
@@ -624,7 +624,7 @@ async function getAllSavedDocuments() {
             try {
                 const ls = localStorage.getItem('dnl_resume_data') || localStorage.getItem('resume_editor_active_data');
                 if (ls) legacy = JSON.parse(ls);
-            } catch (e) {}
+            } catch (e) { }
         }
         if (legacy && typeof legacy === 'object') {
             const firstDoc = {
@@ -637,9 +637,47 @@ async function getAllSavedDocuments() {
             docs = [firstDoc];
         }
     }
-    
+
     // Sort by most recently updated
     return (docs || []).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+}
+
+/**
+ * Open Document & Library Modal Global Controls
+ */
+function openDocumentModal(tab = 'saved') {
+    const openDocModal = document.getElementById('open-document-modal');
+    if (openDocModal) {
+        openDocModal.style.display = 'flex';
+        switchOpenDocTab(tab);
+    }
+}
+
+function closeOpenDocumentModal() {
+    const openDocModal = document.getElementById('open-document-modal');
+    if (openDocModal) openDocModal.style.display = 'none';
+}
+
+function switchOpenDocTab(tab) {
+    const btnSaved = document.getElementById('tab-btn-saved');
+    const btnImport = document.getElementById('tab-btn-import');
+    const btnPdf = document.getElementById('tab-btn-preview-pdf');
+    const panelSaved = document.getElementById('panel-saved-docs');
+    const panelImport = document.getElementById('panel-import-file');
+    const panelPdf = document.getElementById('panel-preview-pdf');
+
+    if (btnSaved) btnSaved.classList.toggle('active', tab === 'saved');
+    if (btnImport) btnImport.classList.toggle('active', tab === 'import');
+    if (btnPdf) btnPdf.classList.toggle('active', tab === 'pdf');
+
+    if (panelSaved) panelSaved.style.display = (tab === 'saved') ? 'block' : 'none';
+    if (panelImport) panelImport.style.display = (tab === 'import') ? 'block' : 'none';
+    if (panelPdf) panelPdf.style.display = (tab === 'pdf') ? 'block' : 'none';
+
+    if (tab === 'saved') {
+        const searchInput = document.getElementById('saved-docs-search');
+        renderSavedDocsList(searchInput ? searchInput.value : '');
+    }
 }
 
 /**
@@ -667,7 +705,7 @@ async function deleteSavedDocument(id) {
 
     await deleteFromDB(DB_STORE_DOCUMENTS, id);
     showToast(`Deleted "${title}"`);
-    
+
     // If deleted the active document, load another or default
     if (state.id === id) {
         const remaining = await getAllSavedDocuments();
@@ -687,7 +725,7 @@ async function saveCurrentAsNewCopy() {
     const newId = 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
     const baseTitle = state.documentTitle || 'Resume';
     const newTitle = baseTitle.includes('(Copy)') ? `${baseTitle} 2` : `${baseTitle} (Copy)`;
-    
+
     state.id = newId;
     state.documentTitle = newTitle;
     await saveToLocalStorage(false);
@@ -703,11 +741,11 @@ function exportResumeFile() {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '') + '.json';
-    
+
     const jsonStr = JSON.stringify(state, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
@@ -715,7 +753,7 @@ function exportResumeFile() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showToast(`Exported "${filename}" to downloads!`);
 }
 
@@ -726,7 +764,7 @@ async function exportSpecificDoc(id) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '') + '.json';
-    
+
     const blob = new Blob([JSON.stringify(doc.data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -749,12 +787,12 @@ function importResumeFromJsonFile(file) {
         try {
             const parsed = JSON.parse(e.target.result);
             if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON format');
-            
+
             parsed.id = 'doc_' + Date.now();
             if (!parsed.documentTitle) {
                 parsed.documentTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ') || 'Imported Resume';
             }
-            
+
             applyLoadedState(parsed);
             await saveToLocalStorage(false);
             showToast(`Restored "${state.documentTitle}" successfully!`);
@@ -811,7 +849,7 @@ async function renderSavedDocsList(filterText = '') {
     if (countEl) countEl.textContent = docs.length;
 
     const query = filterText.toLowerCase().trim();
-    const filtered = query 
+    const filtered = query
         ? docs.filter(d => (d.title || '').toLowerCase().includes(query))
         : docs;
 
@@ -827,8 +865,8 @@ async function renderSavedDocsList(filterText = '') {
 
     container.innerHTML = filtered.map(doc => {
         const isActive = state.id === doc.id;
-        const dateStr = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString(undefined, { 
-            month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+        const dateStr = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString(undefined, {
+            month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : 'Recent';
 
         return `
@@ -869,14 +907,14 @@ function escapeHtml(text) {
  */
 async function loadSavedData() {
     let loaded = null;
-    
+
     // 1. Check IndexedDB active cache
     try {
         const fromDB = await loadFromDB(DB_STORE_CACHE, 'current_resume');
         if (fromDB && typeof fromDB === 'object') {
             loaded = fromDB;
         }
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Check LocalStorage fallback
     if (!loaded) {
@@ -885,7 +923,7 @@ async function loadSavedData() {
             if (saved) {
                 loaded = JSON.parse(saved);
             }
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (loaded) {
@@ -936,13 +974,13 @@ function executeRestoreTemplate() {
     backupBeforeReset = JSON.parse(JSON.stringify(state));
     state = JSON.parse(JSON.stringify(defaultState));
     state.id = 'doc_' + Date.now();
-    state.documentTitle = 'Alex Morgan - Resume';
+    state.documentTitle = 'Sample Resume';
     updateDocumentTitleUI();
     saveToLocalStorage(false);
     renderEditor();
     renderPreview();
     closeResetModal();
-    showToast('Loaded sample template (Alex Morgan)!', false, () => {
+    showToast('Loaded sample template!', false, () => {
         if (backupBeforeReset) {
             state = JSON.parse(JSON.stringify(backupBeforeReset));
             updateDocumentTitleUI();
@@ -1019,7 +1057,7 @@ function renderBullets(text) {
     const lines = text.split('\n');
     let intro = [];
     let bullets = [];
-    
+
     lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed.startsWith('- ')) {
@@ -1049,8 +1087,8 @@ function renderPreview() {
     const pattern = state.backgroundPattern || 'dots';
     preview.className = `resume-page bg-${pattern}`;
 
-    const hasContact = state.personal.phone || state.personal.email || state.personal.website || 
-                       state.personal.location || state.personal.age || state.personal.dob || state.personal.nationality;
+    const hasContact = state.personal.phone || state.personal.email || state.personal.website ||
+        state.personal.location || state.personal.age || state.personal.dob || state.personal.nationality;
 
     preview.innerHTML = `
         <!-- HEADER -->
@@ -1361,7 +1399,7 @@ function renderIconGrid(filterText) {
     grid.innerHTML = '';
     const query = filterText.toLowerCase().trim();
 
-    const filtered = ICON_LIST.filter(item => 
+    const filtered = ICON_LIST.filter(item =>
         item.name.toLowerCase().includes(query) || item.class.toLowerCase().includes(query)
     );
 
@@ -1960,12 +1998,12 @@ function renderEditor() {
     const sFields = summarySec.querySelector('#summary-fields');
     sFields.appendChild(
         createFormGroup(
-            'Professional Summary', 
-            state.summary, 
-            (val) => handleInputChange('summary', null, null, val), 
-            'textarea', 
-            null, 
-            true, 
+            'Professional Summary',
+            state.summary,
+            (val) => handleInputChange('summary', null, null, val),
+            'textarea',
+            null,
+            true,
             'Write a brief professional summary highlighting your key background, technical strengths, and career objectives...'
         )
     );
@@ -1974,12 +2012,12 @@ function renderEditor() {
     // 3. ARRAY SECTIONS (Education, Work & Volunteering, Training, Skills, Interests, Projects)
     const arraySections = [
         { key: 'education', label: 'Education', hasLogo: true, addBtnLabel: 'Add School' },
-        { 
-            key: 'volunteering', 
-            label: 'Work & Volunteering Experience', 
-            hasLogo: true, 
+        {
+            key: 'volunteering',
+            label: 'Work & Volunteering Experience',
+            hasLogo: true,
             isWorkOrVolunteering: true,
-            addBtnLabel: 'Add Role / Experience' 
+            addBtnLabel: 'Add Role / Experience'
         },
         { key: 'training', label: 'Training Courses & Certifications', hasLogo: false, addBtnLabel: 'Add Course' },
         { key: 'skills', label: 'Skills', hasLogo: false, addBtnLabel: 'Add Skill' },
@@ -2117,9 +2155,9 @@ function renderEditor() {
             fieldConfigs[sec.key].forEach(f => {
                 fieldsDiv.appendChild(
                     createFormGroup(
-                        f.label, 
-                        item[f.key], 
-                        (val) => handleInputChange(sec.key, item.id, f.key, val), 
+                        f.label,
+                        item[f.key],
+                        (val) => handleInputChange(sec.key, item.id, f.key, val),
                         f.type,
                         (callback) => openIconPicker(item[f.key], callback),
                         f.isLargeBox || false,
@@ -2315,9 +2353,9 @@ function renderEditor() {
     const sigFields = certSec.querySelector('#signature-fields');
     sigFields.appendChild(
         createFormGroup(
-            'Certification Statement', 
-            state.signature ? state.signature.text : '', 
-            (val) => handleInputChange('signature', null, null, val), 
+            'Certification Statement',
+            state.signature ? state.signature.text : '',
+            (val) => handleInputChange('signature', null, null, val),
             'textarea',
             null,
             false,
@@ -2451,6 +2489,7 @@ function openPdfView() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="${window.location.origin + window.location.pathname}">
     <title>${title}</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rubik:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -2638,46 +2677,14 @@ function setupControls() {
         };
     }
 
-    // Open Document & Library Modal Controls
+    // Open Document & Library Modal Event Handlers
     const openDocModal = document.getElementById('open-document-modal');
     const openDocModalClose = document.getElementById('open-doc-modal-close');
     const openDocModalCancel = document.getElementById('open-doc-modal-cancel');
-
-    function openDocumentModal(tab = 'saved') {
-        if (openDocModal) {
-            openDocModal.style.display = 'flex';
-            switchOpenDocTab(tab);
-        }
-    }
-    function closeOpenDocumentModal() {
-        if (openDocModal) openDocModal.style.display = 'none';
-    }
-
-    function switchOpenDocTab(tab) {
-        const btnSaved = document.getElementById('tab-btn-saved');
-        const btnImport = document.getElementById('tab-btn-import');
-        const btnPdf = document.getElementById('tab-btn-preview-pdf');
-        const panelSaved = document.getElementById('panel-saved-docs');
-        const panelImport = document.getElementById('panel-import-file');
-        const panelPdf = document.getElementById('panel-preview-pdf');
-
-        if (btnSaved) btnSaved.classList.toggle('active', tab === 'saved');
-        if (btnImport) btnImport.classList.toggle('active', tab === 'import');
-        if (btnPdf) btnPdf.classList.toggle('active', tab === 'pdf');
-
-        if (panelSaved) panelSaved.style.display = (tab === 'saved') ? 'block' : 'none';
-        if (panelImport) panelImport.style.display = (tab === 'import') ? 'block' : 'none';
-        if (panelPdf) panelPdf.style.display = (tab === 'pdf') ? 'block' : 'none';
-
-        if (tab === 'saved') {
-            const searchInput = document.getElementById('saved-docs-search');
-            renderSavedDocsList(searchInput ? searchInput.value : '');
-        }
-    }
-
     const btnTabSaved = document.getElementById('tab-btn-saved');
     const btnTabImport = document.getElementById('tab-btn-import');
     const btnTabPdf = document.getElementById('tab-btn-preview-pdf');
+
     if (btnTabSaved) btnTabSaved.onclick = () => switchOpenDocTab('saved');
     if (btnTabImport) btnTabImport.onclick = () => switchOpenDocTab('import');
     if (btnTabPdf) btnTabPdf.onclick = () => switchOpenDocTab('pdf');
@@ -2757,7 +2764,7 @@ function setupControls() {
     if (zoomIn) zoomIn.onclick = () => setZoom(currentZoom + 0.05);
     if (zoomOut) zoomOut.onclick = () => setZoom(currentZoom - 0.05);
     if (zoomFit) zoomFit.onclick = () => autoFitZoom();
-    
+
     // Save to Storage
     if (saveStorageBtn) {
         saveStorageBtn.onclick = () => {
