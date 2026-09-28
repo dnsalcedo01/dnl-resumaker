@@ -41,6 +41,7 @@ The resume layout is structured simply and practically:
 * **Photo & Signature Upload:** Add a formal photo, upload a digital signature, and adjust signature size and positioning.
 * **JSON Backup & Restore:** Export your resume data to a `.json` file to back it up or transfer it to another computer.
 * **PDF Export:** Print or save directly to PDF using your browser's print dialog.
+* **Selectable Header Patterns:** Choose between clean original vector backgrounds (Concentric Dots, Honeycomb, Wavy Curves) or a minimal white layout.
 * **Blank & Sample Templates:** Reset to a blank template with guide placeholders or restore sample data anytime.
 
 ---
@@ -60,3 +61,13 @@ The resume layout is structured simply and practically:
 
 * **Created by:** DNL
 * **Project:** Resu-maker
+
+---
+
+## ⚖️ Disclaimer
+
+**Resu-maker by DNL** is an open-source educational portfolio project.
+
+* **Original Assets:** Background patterns and UI graphics are original vector designs created for this project.
+* **Trademarks:** Any brand names or logos shown in sample templates belong to their respective owners and are used solely for demonstration.
+* **Fair Use:** Distributed in good faith for personal and educational use. For inquiries, please open an Issue.

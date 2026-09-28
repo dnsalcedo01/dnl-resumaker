@@ -117,6 +117,7 @@ const ICON_LIST = [
 const defaultState = {
     id: "doc_default_sample",
     documentTitle: "Alex Morgan - Resume",
+    backgroundPattern: "dots",
     personal: {
         name: "Alex Morgan",
         title: "Information Technology Specialist",
@@ -245,6 +246,7 @@ let state = JSON.parse(JSON.stringify(defaultState));
 const BLANK_TEMPLATE_STATE = {
     id: "doc_blank_template",
     documentTitle: "Untitled Resume",
+    backgroundPattern: "dots",
     personal: {
         name: "",
         title: "",
@@ -1044,6 +1046,9 @@ function renderPreview() {
     const preview = document.getElementById('resume-preview');
     if (!preview) return;
 
+    const pattern = state.backgroundPattern || 'dots';
+    preview.className = `resume-page bg-${pattern}`;
+
     const hasContact = state.personal.phone || state.personal.email || state.personal.website || 
                        state.personal.location || state.personal.age || state.personal.dob || state.personal.nationality;
 
@@ -1736,6 +1741,132 @@ function renderEditor() {
     const container = document.getElementById('editor-form-container');
     if (!container) return;
     container.innerHTML = '';
+
+    // 0. HEADER STYLE & BACKGROUND PATTERN SECTION
+    const bgSec = document.createElement('div');
+    bgSec.className = 'form-section';
+    const currentPattern = state.backgroundPattern || 'dots';
+    bgSec.innerHTML = `
+        <div class="section-header">
+            <div class="section-header-left">
+                <i class="fas fa-chevron-down section-toggle-icon"></i>
+                <h3 class="section-title"><i class="fas fa-palette" style="color: var(--primary-color); margin-right: 6px;"></i> Header Background Pattern</h3>
+            </div>
+        </div>
+        <div class="section-body">
+            <p class="pattern-picker-description">Choose a clean vector background pattern for your resume header:</p>
+            <div class="pattern-picker-grid">
+                <button type="button" class="pattern-option-card ${currentPattern === 'dots' ? 'active' : ''}" data-pattern="dots" title="Concentric Dots Pattern">
+                    <div class="pattern-option-thumb">
+                        <svg viewBox="0 0 54 54" width="100%" height="100%">
+                            <rect width="54" height="54" fill="#f0f7ff"/>
+                            <circle cx="54" cy="12" r="2.2" fill="#1d4ed8"/>
+                            <circle cx="45.5" cy="8" r="2.2" fill="#1d4ed8"/>
+                            <circle cx="42" cy="0" r="2.2" fill="#1d4ed8"/>
+                            <circle cx="54" cy="24" r="2.2" fill="#2563eb"/>
+                            <circle cx="44.8" cy="21.5" r="2.2" fill="#2563eb"/>
+                            <circle cx="37" cy="15.5" r="2.2" fill="#2563eb"/>
+                            <circle cx="32.5" cy="0" r="2.2" fill="#2563eb"/>
+                            <circle cx="54" cy="36" r="2.1" fill="#3b82f6"/>
+                            <circle cx="45" cy="34" r="2.1" fill="#3b82f6"/>
+                            <circle cx="36.5" cy="28.5" r="2.1" fill="#3b82f6"/>
+                            <circle cx="28.5" cy="21.5" r="2.1" fill="#3b82f6"/>
+                            <circle cx="23" cy="11.5" r="2.1" fill="#3b82f6"/>
+                            <circle cx="21" cy="0" r="2.1" fill="#3b82f6"/>
+                            <circle cx="54" cy="48" r="2.0" fill="#60a5fa"/>
+                            <circle cx="44.5" cy="46" r="2.0" fill="#60a5fa"/>
+                            <circle cx="35.5" cy="41.5" r="2.0" fill="#60a5fa"/>
+                            <circle cx="27" cy="34.5" r="2.0" fill="#60a5fa"/>
+                            <circle cx="19.5" cy="25" r="2.0" fill="#60a5fa"/>
+                            <circle cx="13.5" cy="14" r="2.0" fill="#60a5fa"/>
+                            <circle cx="11" cy="0" r="2.0" fill="#60a5fa"/>
+                        </svg>
+                    </div>
+                    <div class="pattern-option-info">
+                        <span class="pattern-name">Concentric Dots</span>
+                        <span class="pattern-desc">Signature circular arcs</span>
+                    </div>
+                    <i class="fas fa-check pattern-active-check"></i>
+                </button>
+                <button type="button" class="pattern-option-card ${currentPattern === 'honeycomb' ? 'active' : ''}" data-pattern="honeycomb" title="Honeycomb Hexagonal Pattern">
+                    <div class="pattern-option-thumb">
+                        <svg viewBox="0 0 54 54" width="100%" height="100%">
+                            <rect width="54" height="54" fill="#f0f7ff"/>
+                            <g stroke="#2563eb" stroke-width="1.8" fill="none" stroke-linejoin="round">
+                                <polygon points="46,4 52,14 46,24 34,24 28,14 34,4" fill="#bfdbfe" fill-opacity="0.45"/>
+                                <polygon points="28,14 34,24 28,34 16,34 10,24 16,14"/>
+                                <polygon points="46,24 52,34 46,44 34,44 28,34 34,24" fill="#bfdbfe" fill-opacity="0.25"/>
+                                <polygon points="28,34 34,44 28,54 16,54 10,44 16,34"/>
+                                <polygon points="10,24 16,34 10,44 -2,44 -8,34 -2,24" stroke-opacity="0.6"/>
+                                <polygon points="46,44 52,54 46,64 34,64 28,54 34,44" stroke-opacity="0.5"/>
+                                <polygon points="64,14 70,24 64,34 52,34 46,24 52,14" stroke-opacity="0.7"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="pattern-option-info">
+                        <span class="pattern-name">Honeycomb</span>
+                        <span class="pattern-desc">Hexagonal tech mesh</span>
+                    </div>
+                    <i class="fas fa-check pattern-active-check"></i>
+                </button>
+                <button type="button" class="pattern-option-card ${currentPattern === 'waves' ? 'active' : ''}" data-pattern="waves" title="Wavy Curves Contour Pattern">
+                    <div class="pattern-option-thumb">
+                        <svg viewBox="0 0 54 54" width="100%" height="100%">
+                            <rect width="54" height="54" fill="#f0f7ff"/>
+                            <path d="M 54,6 C 42,12 36,2 24,10 C 16,16 10,12 0,18" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round"/>
+                            <path d="M 54,17 C 42,23 36,13 24,21 C 16,27 10,23 0,29" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M 54,28 C 42,34 36,24 24,32 C 16,38 10,34 0,40" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M 54,39 C 42,45 36,35 24,43 C 16,49 10,45 0,51" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M 54,50 C 42,56 36,46 24,54 C 16,60 10,56 0,62" fill="none" stroke="#93c5fd" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="pattern-option-info">
+                        <span class="pattern-name">Wavy Curves</span>
+                        <span class="pattern-desc">Smooth fluid contours</span>
+                    </div>
+                    <i class="fas fa-check pattern-active-check"></i>
+                </button>
+                <button type="button" class="pattern-option-card ${currentPattern === 'none' ? 'active' : ''}" data-pattern="none" title="Plain Minimalist White Header">
+                    <div class="pattern-option-thumb">
+                        <svg viewBox="0 0 54 54" width="100%" height="100%">
+                            <rect width="54" height="54" fill="#f8fafc"/>
+                            <rect x="11" y="9" width="32" height="36" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+                            <line x1="17" y1="17" x2="31" y2="17" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
+                            <line x1="17" y1="23" x2="37" y2="23" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="17" y1="29" x2="33" y2="29" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="17" y1="35" x2="27" y2="35" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="37" cy="37" r="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.3"/>
+                            <line x1="31.5" y1="42.5" x2="42.5" y2="31.5" stroke="#64748b" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="pattern-option-info">
+                        <span class="pattern-name">Plain / Minimal</span>
+                        <span class="pattern-desc">No decorative graphics</span>
+                    </div>
+                    <i class="fas fa-check pattern-active-check"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+    bgSec.querySelector('.section-header').onclick = (e) => {
+        if (!e.target.closest('button')) bgSec.classList.toggle('collapsed');
+    };
+
+    bgSec.querySelectorAll('.pattern-option-card').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const pat = btn.dataset.pattern;
+            state.backgroundPattern = pat;
+            bgSec.querySelectorAll('.pattern-option-card').forEach(c => {
+                c.classList.toggle('active', c.dataset.pattern === pat);
+            });
+            renderPreview();
+            saveStateToActive();
+        };
+    });
+
+    container.appendChild(bgSec);
 
     // 1. PERSONAL INFORMATION & 1:1 PHOTO SECTION
     const personalSec = document.createElement('div');
@@ -2435,6 +2566,9 @@ function openPdfView() {
                 display: block !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            #resume-preview.bg-none::before {
+                display: none !important;
             }
         }
     </style>
