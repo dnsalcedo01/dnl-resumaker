@@ -2622,23 +2622,39 @@ function updateOrderFromDOM(listElement) {
 }
 
 // --- ZOOM CONTROLS ---
+const A4_WIDTH_PX = 794;   // 210mm at 96dpi
+const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
 let currentZoom = 0.88;
 
 function setZoom(val) {
-    currentZoom = Math.min(Math.max(val, 0.4), 1.5);
+    currentZoom = Math.min(Math.max(val, 0.35), 1.5);
     const wrapper = document.getElementById('resume-wrapper');
+    const preview = document.getElementById('resume-preview');
     const label = document.getElementById('zoom-label');
-    if (wrapper) wrapper.style.transform = `scale(${currentZoom})`;
-    if (label) label.textContent = `${Math.round(currentZoom * 100)}%`;
+
+    const scaledW = Math.round(A4_WIDTH_PX * currentZoom);
+    const scaledH = Math.round(A4_HEIGHT_PX * currentZoom);
+
+    if (wrapper) {
+        wrapper.style.width = `${scaledW}px`;
+        wrapper.style.height = `${scaledH}px`;
+    }
+    if (preview) {
+        preview.style.transform = `scale(${currentZoom})`;
+        preview.style.transformOrigin = 'top left';
+    }
+    if (label) {
+        label.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
 }
 
 function autoFitZoom() {
     const panel = document.querySelector('.preview-panel');
     if (!panel) return;
-    const availableWidth = panel.clientWidth - 36;
-    const resumeWidthPx = 794; // ~210mm in px at 96dpi
-    const targetZoom = Math.min(availableWidth / resumeWidthPx, 1.0);
-    setZoom(targetZoom);
+    const availableWidth = panel.clientWidth - 40;
+    if (availableWidth <= 0) return;
+    const targetZoom = Math.min(availableWidth / A4_WIDTH_PX, 1.0);
+    setZoom(Math.max(targetZoom, 0.35));
 }
 
 /**
@@ -3125,8 +3141,39 @@ function setupControls() {
         };
     }
 
+    // Tablet & Mobile View Switcher (<= 860px)
+    const btnSwitchEditor = document.getElementById('view-switch-editor');
+    const btnSwitchPreview = document.getElementById('view-switch-preview');
+    const appContainer = document.querySelector('.app-container');
+
+    if (btnSwitchEditor && btnSwitchPreview && appContainer) {
+        btnSwitchEditor.onclick = () => {
+            btnSwitchEditor.classList.add('active');
+            btnSwitchPreview.classList.remove('active');
+            appContainer.classList.remove('show-preview');
+        };
+        btnSwitchPreview.onclick = () => {
+            btnSwitchPreview.classList.add('active');
+            btnSwitchEditor.classList.remove('active');
+            appContainer.classList.add('show-preview');
+            setTimeout(() => {
+                autoFitZoom();
+            }, 60);
+        };
+    }
+
+    // Responsive Canvas Resize & Tablet Orientation Listener
+    let resizeTimer = null;
     window.addEventListener('resize', () => {
-        // Keeps canvas layout responsive
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            autoFitZoom();
+        }, 120);
+    });
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            autoFitZoom();
+        }, 200);
     });
 }
 
@@ -3134,4 +3181,13 @@ function setupControls() {
 setupControls();
 autoFitZoom();
 loadSavedData();
+
+// Register PWA Service Worker for offline capability
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+            console.log('ServiceWorker registration error:', err);
+        });
+    });
+}
 
