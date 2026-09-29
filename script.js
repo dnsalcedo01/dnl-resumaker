@@ -118,6 +118,7 @@ const defaultState = {
     id: "doc_default_sample",
     documentTitle: "Sample Resume",
     backgroundPattern: "dots",
+    colorTheme: "navy",
     personal: {
         name: "Alex Morgan",
         title: "Information Technology Specialist",
@@ -247,6 +248,7 @@ const BLANK_TEMPLATE_STATE = {
     id: "doc_blank_template",
     documentTitle: "Untitled Resume",
     backgroundPattern: "dots",
+    colorTheme: "navy",
     personal: {
         name: "",
         title: "",
@@ -617,8 +619,9 @@ async function saveToLocalStorage(showAlert = true) {
 async function getAllSavedDocuments() {
     let docs = await getAllFromDB(DB_STORE_DOCUMENTS);
 
-    // Auto-migration: if catalog is empty but legacy cache exists, import it as first document
-    if (!docs || docs.length === 0) {
+    // Auto-migration: only run on very first launch if catalog has NEVER been initialized
+    const hasInitializedCatalog = localStorage.getItem('dnl_catalog_initialized') === 'true';
+    if (!hasInitializedCatalog && (!docs || docs.length === 0)) {
         let legacy = await loadFromDB(DB_STORE_CACHE, 'current_resume');
         if (!legacy) {
             try {
@@ -637,15 +640,22 @@ async function getAllSavedDocuments() {
             docs = [firstDoc];
         }
     }
+    localStorage.setItem('dnl_catalog_initialized', 'true');
 
     // Sort by most recently updated
     return (docs || []).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
 }
 
+let openDocOrigin = null; // 'welcome' | 'menu' | null
+let resetModalOrigin = null; // 'menu' | null
+
 /**
  * Open Document & Library Modal Global Controls
  */
-function openDocumentModal(tab = 'saved') {
+function openDocumentModal(tab = 'saved', origin = null) {
+    if (origin) {
+        openDocOrigin = origin;
+    }
     const openDocModal = document.getElementById('open-document-modal');
     if (openDocModal) {
         openDocModal.style.display = 'flex';
@@ -653,26 +663,38 @@ function openDocumentModal(tab = 'saved') {
     }
 }
 
-function closeOpenDocumentModal() {
+function closeOpenDocumentModal(documentLoaded = false) {
     const openDocModal = document.getElementById('open-document-modal');
     if (openDocModal) openDocModal.style.display = 'none';
+
+    if (!documentLoaded) {
+        if (openDocOrigin === 'welcome') {
+            showWelcomeModal();
+        } else if (openDocOrigin === 'menu') {
+            openActionsModal();
+        } else {
+            // If origin not set and database is empty, return to welcome
+            getAllFromDB(DB_STORE_DOCUMENTS).then(docs => {
+                if (!docs || docs.length === 0) {
+                    showWelcomeModal();
+                }
+            }).catch(() => {});
+        }
+    }
+    openDocOrigin = null;
 }
 
 function switchOpenDocTab(tab) {
     const btnSaved = document.getElementById('tab-btn-saved');
     const btnImport = document.getElementById('tab-btn-import');
-    const btnPdf = document.getElementById('tab-btn-preview-pdf');
     const panelSaved = document.getElementById('panel-saved-docs');
     const panelImport = document.getElementById('panel-import-file');
-    const panelPdf = document.getElementById('panel-preview-pdf');
 
     if (btnSaved) btnSaved.classList.toggle('active', tab === 'saved');
     if (btnImport) btnImport.classList.toggle('active', tab === 'import');
-    if (btnPdf) btnPdf.classList.toggle('active', tab === 'pdf');
 
     if (panelSaved) panelSaved.style.display = (tab === 'saved') ? 'block' : 'none';
     if (panelImport) panelImport.style.display = (tab === 'import') ? 'block' : 'none';
-    if (panelPdf) panelPdf.style.display = (tab === 'pdf') ? 'block' : 'none';
 
     if (tab === 'saved') {
         const searchInput = document.getElementById('saved-docs-search');
@@ -692,7 +714,7 @@ async function openSavedDocument(id) {
     applyLoadedState(doc.data);
     await saveToDB(DB_STORE_CACHE, 'current_resume', state);
     showToast(`Loaded "${state.documentTitle}"`);
-    closeOpenDocumentModal();
+    closeOpenDocumentModal(true);
 }
 
 /**
@@ -706,13 +728,26 @@ async function deleteSavedDocument(id) {
     await deleteFromDB(DB_STORE_DOCUMENTS, id);
     showToast(`Deleted "${title}"`);
 
-    // If deleted the active document, load another or default
+    // If deleted the active document, load another or clean fresh template
     if (state.id === id) {
         const remaining = await getAllSavedDocuments();
-        if (remaining.length > 0) {
+        if (remaining && remaining.length > 0) {
             applyLoadedState(remaining[0].data);
+            await saveToDB(DB_STORE_CACHE, 'current_resume', state);
+            try {
+                localStorage.setItem('resume_editor_active_data', JSON.stringify(state));
+                localStorage.setItem('resume_editor_active_id', state.id);
+            } catch (e) { }
         } else {
-            applyLoadedState(defaultState);
+            const freshState = JSON.parse(JSON.stringify(BLANK_TEMPLATE_STATE));
+            freshState.id = 'doc_' + Date.now();
+            freshState.documentTitle = 'Untitled Resume';
+            applyLoadedState(freshState);
+            await saveToDB(DB_STORE_CACHE, 'current_resume', freshState);
+            try {
+                localStorage.setItem('resume_editor_active_data', JSON.stringify(freshState));
+                localStorage.setItem('resume_editor_active_id', freshState.id);
+            } catch (e) { }
         }
     }
     renderSavedDocsList();
@@ -734,13 +769,13 @@ async function saveCurrentAsNewCopy() {
 }
 
 /**
- * Exports resume state as a downloadable JSON backup file.
+ * Exports resume state as a downloadable project backup file (.resume).
  */
 function exportResumeFile() {
     const filename = (state.documentTitle || 'resume')
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '') + '.json';
+        .replace(/^_+|_+$/g, '') + '.resume';
 
     const jsonStr = JSON.stringify(state, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -763,7 +798,7 @@ async function exportSpecificDoc(id) {
     const filename = (doc.title || 'resume')
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '') + '.json';
+        .replace(/^_+|_+$/g, '') + '.resume';
 
     const blob = new Blob([JSON.stringify(doc.data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -796,7 +831,7 @@ function importResumeFromJsonFile(file) {
             applyLoadedState(parsed);
             await saveToLocalStorage(false);
             showToast(`Restored "${state.documentTitle}" successfully!`);
-            closeOpenDocumentModal();
+            closeOpenDocumentModal(true);
         } catch (err) {
             console.error(err);
             alert('Failed to read resume file. Please ensure it is a valid resume JSON export.');
@@ -812,7 +847,7 @@ function openLocalPdfFile(file) {
     if (!file) return;
     const blobUrl = URL.createObjectURL(file);
     window.open(blobUrl, '_blank');
-    closeOpenDocumentModal();
+    closeOpenDocumentModal(true);
 }
 
 /**
@@ -830,6 +865,8 @@ function applyLoadedState(loaded) {
     if (loaded.signature) state.signature = Object.assign({}, defaultState.signature, loaded.signature);
     if (loaded.documentTitle) state.documentTitle = loaded.documentTitle;
     if (loaded.id) state.id = loaded.id;
+    if (loaded.backgroundPattern) state.backgroundPattern = loaded.backgroundPattern;
+    if (loaded.colorTheme) state.colorTheme = loaded.colorTheme;
 
     updateDocumentTitleUI();
     setSaveStatus(true);
@@ -903,6 +940,32 @@ function escapeHtml(text) {
 }
 
 /**
+ * Welcome / Onboarding Modal Global Controls
+ */
+function showWelcomeModal() {
+    const modal = document.getElementById('welcome-onboard-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeWelcomeModal() {
+    const modal = document.getElementById('welcome-onboard-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+/**
+ * Resume Actions / Menu Modal Global Controls
+ */
+function openActionsModal() {
+    const modal = document.getElementById('resume-actions-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeActionsModal() {
+    const modal = document.getElementById('resume-actions-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+/**
  * Loads saved state on application startup.
  */
 async function loadSavedData() {
@@ -926,26 +989,40 @@ async function loadSavedData() {
         } catch (e) { }
     }
 
-    if (loaded) {
+    // 3. Check saved document library catalog
+    let docs = [];
+    try {
+        docs = await getAllFromDB(DB_STORE_DOCUMENTS);
+    } catch (e) { }
+
+    if (loaded && docs && docs.length > 0) {
         applyLoadedState(loaded);
     } else {
-        updateDocumentTitleUI();
-        renderEditor();
-        renderPreview();
+        // First-time visit, no saved resume yet, or cleared database
+        applyLoadedState(defaultState);
+        showWelcomeModal();
     }
 }
 
 // --- SAFE RESET WORKFLOW ---
 let backupBeforeReset = null;
 
-function showResetModal() {
+function showResetModal(origin = null) {
+    if (origin) {
+        resetModalOrigin = origin;
+    }
     const modal = document.getElementById('reset-confirm-modal');
     if (modal) modal.style.display = 'flex';
 }
 
-function closeResetModal() {
+function closeResetModal(resetExecuted = false) {
     const modal = document.getElementById('reset-confirm-modal');
     if (modal) modal.style.display = 'none';
+
+    if (!resetExecuted && resetModalOrigin === 'menu') {
+        openActionsModal();
+    }
+    resetModalOrigin = null;
 }
 
 function executeResetToBlank() {
@@ -957,7 +1034,7 @@ function executeResetToBlank() {
     saveToLocalStorage(false);
     renderEditor();
     renderPreview();
-    closeResetModal();
+    closeResetModal(true);
     showToast('Created new blank resume!', false, () => {
         if (backupBeforeReset) {
             state = JSON.parse(JSON.stringify(backupBeforeReset));
@@ -979,7 +1056,7 @@ function executeRestoreTemplate() {
     saveToLocalStorage(false);
     renderEditor();
     renderPreview();
-    closeResetModal();
+    closeResetModal(true);
     showToast('Loaded sample template!', false, () => {
         if (backupBeforeReset) {
             state = JSON.parse(JSON.stringify(backupBeforeReset));
@@ -1085,7 +1162,8 @@ function renderPreview() {
     if (!preview) return;
 
     const pattern = state.backgroundPattern || 'dots';
-    preview.className = `resume-page bg-${pattern}`;
+    const colorTheme = state.colorTheme || 'navy';
+    preview.className = `resume-page bg-${pattern} theme-${colorTheme}`;
 
     const hasContact = state.personal.phone || state.personal.email || state.personal.website ||
         state.personal.location || state.personal.age || state.personal.dob || state.personal.nationality;
@@ -1774,13 +1852,122 @@ function createFormGroup(label, value, onChange, type = 'text', onIconPick = nul
     return group;
 }
 
+// --- EDITOR TAB STATE & NAVIGATION ---
+let currentEditorTab = 'content'; // 'content' | 'design'
+
+function switchEditorTab(tab) {
+    currentEditorTab = tab;
+    const btnContent = document.getElementById('editor-nav-content');
+    const btnDesign = document.getElementById('editor-nav-design');
+    const paneContent = document.getElementById('editor-tab-pane-content');
+    const paneDesign = document.getElementById('editor-tab-pane-design');
+    const helperBanner = document.getElementById('editor-helper-banner');
+
+    if (btnContent) btnContent.classList.toggle('active', tab === 'content');
+    if (btnDesign) btnDesign.classList.toggle('active', tab === 'design');
+    if (paneContent) paneContent.style.display = (tab === 'content') ? 'block' : 'none';
+    if (paneDesign) paneDesign.style.display = (tab === 'design') ? 'block' : 'none';
+    if (helperBanner) helperBanner.style.display = (tab === 'content') ? 'flex' : 'none';
+}
+
 // --- RENDER EDITOR FORM ---
 function renderEditor() {
     const container = document.getElementById('editor-form-container');
     if (!container) return;
     container.innerHTML = '';
 
-    // 0. HEADER STYLE & BACKGROUND PATTERN SECTION
+    const contentPane = document.createElement('div');
+    contentPane.className = 'editor-tab-pane';
+    contentPane.id = 'editor-tab-pane-content';
+    contentPane.style.display = (currentEditorTab === 'content') ? 'block' : 'none';
+
+    const designPane = document.createElement('div');
+    designPane.className = 'editor-tab-pane';
+    designPane.id = 'editor-tab-pane-design';
+    designPane.style.display = (currentEditorTab === 'design') ? 'block' : 'none';
+
+    // 0.A COLOR PALETTE & THEME SECTION
+    const paletteSec = document.createElement('div');
+    paletteSec.className = 'form-section';
+    const currentTheme = state.colorTheme || 'navy';
+    paletteSec.innerHTML = `
+        <div class="section-header">
+            <div class="section-header-left">
+                <i class="fas fa-chevron-down section-toggle-icon"></i>
+                <h3 class="section-title"><i class="fas fa-tint" style="color: var(--primary-color); margin-right: 6px;"></i> Color Palette & Theme</h3>
+            </div>
+        </div>
+        <div class="section-body">
+            <p class="palette-picker-description">Choose a curated palette for headings, text accents, icons, and background pattern:</p>
+            <div class="palette-picker-grid">
+                <button type="button" class="palette-option-card ${currentTheme === 'navy' ? 'active' : ''}" data-theme="navy" title="Classic Navy & Amber (Default)">
+                    <div class="palette-swatch-box">
+                        <div class="palette-swatch-primary" style="background: #1c4482;"></div>
+                        <div class="palette-swatch-secondary" style="background: #df6a26;"></div>
+                    </div>
+                    <div class="palette-option-info">
+                        <span class="palette-option-name">Classic Navy</span>
+                        <span class="palette-option-desc">Navy & amber (default)</span>
+                    </div>
+                    <i class="fas fa-check palette-active-check"></i>
+                </button>
+                <button type="button" class="palette-option-card ${currentTheme === 'emerald' ? 'active' : ''}" data-theme="emerald" title="Forest Emerald & Teal">
+                    <div class="palette-swatch-box">
+                        <div class="palette-swatch-primary" style="background: #065f46;"></div>
+                        <div class="palette-swatch-secondary" style="background: #0d9488;"></div>
+                    </div>
+                    <div class="palette-option-info">
+                        <span class="palette-option-name">Forest Emerald</span>
+                        <span class="palette-option-desc">Deep emerald & teal</span>
+                    </div>
+                    <i class="fas fa-check palette-active-check"></i>
+                </button>
+                <button type="button" class="palette-option-card ${currentTheme === 'burgundy' ? 'active' : ''}" data-theme="burgundy" title="Executive Burgundy & Bronze">
+                    <div class="palette-swatch-box">
+                        <div class="palette-swatch-primary" style="background: #881337;"></div>
+                        <div class="palette-swatch-secondary" style="background: #c2410c;"></div>
+                    </div>
+                    <div class="palette-option-info">
+                        <span class="palette-option-name">Burgundy Wine</span>
+                        <span class="palette-option-desc">Rich wine & bronze</span>
+                    </div>
+                    <i class="fas fa-check palette-active-check"></i>
+                </button>
+                <button type="button" class="palette-option-card ${currentTheme === 'slate' ? 'active' : ''}" data-theme="slate" title="Modern Graphite & Slate">
+                    <div class="palette-swatch-box">
+                        <div class="palette-swatch-primary" style="background: #1e293b;"></div>
+                        <div class="palette-swatch-secondary" style="background: #475569;"></div>
+                    </div>
+                    <div class="palette-option-info">
+                        <span class="palette-option-name">Graphite Slate</span>
+                        <span class="palette-option-desc">Charcoal & steel slate</span>
+                    </div>
+                    <i class="fas fa-check palette-active-check"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+    paletteSec.querySelector('.section-header').onclick = (e) => {
+        if (!e.target.closest('button')) paletteSec.classList.toggle('collapsed');
+    };
+
+    paletteSec.querySelectorAll('.palette-option-card').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const theme = btn.dataset.theme;
+            state.colorTheme = theme;
+            paletteSec.querySelectorAll('.palette-option-card').forEach(c => {
+                c.classList.toggle('active', c.dataset.theme === theme);
+            });
+            renderPreview();
+            triggerAutoSave();
+        };
+    });
+
+    designPane.appendChild(paletteSec);
+
+    // 0.B HEADER STYLE & BACKGROUND PATTERN SECTION
     const bgSec = document.createElement('div');
     bgSec.className = 'form-section';
     const currentPattern = state.backgroundPattern || 'dots';
@@ -1900,11 +2087,11 @@ function renderEditor() {
                 c.classList.toggle('active', c.dataset.pattern === pat);
             });
             renderPreview();
-            saveStateToActive();
+            triggerAutoSave();
         };
     });
 
-    container.appendChild(bgSec);
+    designPane.appendChild(bgSec);
 
     // 1. PERSONAL INFORMATION & 1:1 PHOTO SECTION
     const personalSec = document.createElement('div');
@@ -1978,7 +2165,7 @@ function renderEditor() {
         };
     }
 
-    container.appendChild(personalSec);
+    contentPane.appendChild(personalSec);
 
     // 2. Professional Summary Section
     const summarySec = document.createElement('div');
@@ -2007,7 +2194,7 @@ function renderEditor() {
             'Write a brief professional summary highlighting your key background, technical strengths, and career objectives...'
         )
     );
-    container.appendChild(summarySec);
+    contentPane.appendChild(summarySec);
 
     // 3. ARRAY SECTIONS (Education, Work & Volunteering, Training, Skills, Interests, Projects)
     const arraySections = [
@@ -2170,7 +2357,7 @@ function renderEditor() {
             listDiv.appendChild(itemDiv);
         });
 
-        container.appendChild(secDiv);
+        contentPane.appendChild(secDiv);
     });
 
     // 4. SIGNATURE & CERTIFICATION SECTION
@@ -2363,7 +2550,10 @@ function renderEditor() {
         )
     );
 
-    container.appendChild(certSec);
+    contentPane.appendChild(certSec);
+
+    container.appendChild(contentPane);
+    container.appendChild(designPane);
 
     initDragAndDrop();
 }
@@ -2661,13 +2851,6 @@ function setupControls() {
     const actionsModalClose = document.getElementById('actions-modal-close');
     const actionsModalCancel = document.getElementById('actions-modal-cancel');
 
-    function openActionsModal() {
-        if (actionsModal) actionsModal.style.display = 'flex';
-    }
-    function closeActionsModal() {
-        if (actionsModal) actionsModal.style.display = 'none';
-    }
-
     if (actionsModalOpenBtn) actionsModalOpenBtn.onclick = openActionsModal;
     if (actionsModalClose) actionsModalClose.onclick = closeActionsModal;
     if (actionsModalCancel) actionsModalCancel.onclick = closeActionsModal;
@@ -2744,19 +2927,19 @@ function setupControls() {
         });
     }
 
-    const openStandalonePdfBtn = document.getElementById('open-standalone-pdf-window-btn');
+    const openStandalonePdfBtn = document.getElementById('open-standalone-pdf-btn');
     if (openStandalonePdfBtn) {
         openStandalonePdfBtn.onclick = () => {
-            closeOpenDocumentModal();
+            closeActionsModal();
             openPdfView();
         };
     }
 
-    if (openDocModalClose) openDocModalClose.onclick = closeOpenDocumentModal;
-    if (openDocModalCancel) openDocModalCancel.onclick = closeOpenDocumentModal;
+    if (openDocModalClose) openDocModalClose.onclick = () => closeOpenDocumentModal(false);
+    if (openDocModalCancel) openDocModalCancel.onclick = () => closeOpenDocumentModal(false);
     if (openDocModal) {
         openDocModal.onclick = (e) => {
-            if (e.target === openDocModal) closeOpenDocumentModal();
+            if (e.target === openDocModal) closeOpenDocumentModal(false);
         };
     }
 
@@ -2777,7 +2960,7 @@ function setupControls() {
     if (openPdfBtn) {
         openPdfBtn.onclick = () => {
             closeActionsModal();
-            openDocumentModal('saved');
+            openDocumentModal('saved', 'menu');
         };
     }
 
@@ -2793,7 +2976,7 @@ function setupControls() {
     if (resetDefaultBtn) {
         resetDefaultBtn.onclick = () => {
             closeActionsModal();
-            showResetModal();
+            showResetModal('menu');
         };
     }
 
@@ -2804,13 +2987,13 @@ function setupControls() {
     const resetModalRestoreTemplate = document.getElementById('reset-modal-restore-template');
     const resetModal = document.getElementById('reset-confirm-modal');
 
-    if (resetModalClose) resetModalClose.onclick = closeResetModal;
-    if (resetModalCancel) resetModalCancel.onclick = closeResetModal;
+    if (resetModalClose) resetModalClose.onclick = () => closeResetModal(false);
+    if (resetModalCancel) resetModalCancel.onclick = () => closeResetModal(false);
     if (resetModalConfirmBlank) resetModalConfirmBlank.onclick = executeResetToBlank;
     if (resetModalRestoreTemplate) resetModalRestoreTemplate.onclick = executeRestoreTemplate;
     if (resetModal) {
         resetModal.onclick = (e) => {
-            if (e.target === resetModal) closeResetModal();
+            if (e.target === resetModal) closeResetModal(false);
         };
     }
 
@@ -2844,7 +3027,7 @@ function setupControls() {
         cardOpenPdf.onclick = (e) => {
             if (e.target.closest('button')) return;
             closeActionsModal();
-            openDocumentModal('saved');
+            openDocumentModal('saved', 'menu');
         };
     }
     if (cardExportPdf) {
@@ -2852,6 +3035,14 @@ function setupControls() {
             if (e.target.closest('button')) return;
             closeActionsModal();
             if (guideModal) guideModal.style.display = 'flex';
+        };
+    }
+    const cardStandalonePdf = document.getElementById('card-standalone-pdf');
+    if (cardStandalonePdf) {
+        cardStandalonePdf.onclick = (e) => {
+            if (e.target.closest('button')) return;
+            closeActionsModal();
+            openPdfView();
         };
     }
     if (cardExportJson) {
@@ -2865,7 +3056,7 @@ function setupControls() {
         cardReset.onclick = (e) => {
             if (e.target.closest('button')) return;
             closeActionsModal();
-            showResetModal();
+            showResetModal('menu');
         };
     }
     if (guideClose) guideClose.onclick = () => { guideModal.style.display = 'none'; };
@@ -2894,6 +3085,44 @@ function setupControls() {
         iconSearch.addEventListener('input', (e) => {
             renderIconGrid(e.target.value);
         });
+    }
+
+    // Editor Navigation Tabs (Content vs Design)
+    const navContent = document.getElementById('editor-nav-content');
+    const navDesign = document.getElementById('editor-nav-design');
+    if (navContent) navContent.onclick = () => switchEditorTab('content');
+    if (navDesign) navDesign.onclick = () => switchEditorTab('design');
+
+    // Welcome / First-Visit Onboarding Modal Controls
+    const welcomeModal = document.getElementById('welcome-onboard-modal');
+    const welcomeClose = document.getElementById('welcome-modal-close');
+    const welcomeOpenDoc = document.getElementById('welcome-open-doc-btn');
+    const welcomeSample = document.getElementById('welcome-sample-btn');
+    const welcomeBlank = document.getElementById('welcome-blank-btn');
+
+    if (welcomeClose) welcomeClose.onclick = closeWelcomeModal;
+    if (welcomeModal) {
+        welcomeModal.onclick = (e) => {
+            if (e.target === welcomeModal) closeWelcomeModal();
+        };
+    }
+    if (welcomeOpenDoc) {
+        welcomeOpenDoc.onclick = () => {
+            closeWelcomeModal();
+            openDocumentModal('saved', 'welcome');
+        };
+    }
+    if (welcomeSample) {
+        welcomeSample.onclick = () => {
+            closeWelcomeModal();
+            executeRestoreTemplate();
+        };
+    }
+    if (welcomeBlank) {
+        welcomeBlank.onclick = () => {
+            closeWelcomeModal();
+            executeResetToBlank();
+        };
     }
 
     window.addEventListener('resize', () => {

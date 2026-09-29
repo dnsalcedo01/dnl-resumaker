@@ -50,8 +50,18 @@
                 </span>
             </div>
 
+            <!-- Editor Navigation Tabs (Content vs Design & Theme) -->
+            <div class="editor-nav-tabs">
+                <button type="button" class="editor-nav-tab active" id="editor-nav-content">
+                    <i class="fas fa-edit"></i> Resume Content
+                </button>
+                <button type="button" class="editor-nav-tab" id="editor-nav-design">
+                    <i class="fas fa-palette"></i> Design & Theme
+                </button>
+            </div>
+
             <!-- Formatting Helper Banner -->
-            <div class="editor-helper-banner">
+            <div class="editor-helper-banner" id="editor-helper-banner">
                 <span><i class="fas fa-highlighter"></i> Highlight text and click <strong>B</strong>, <em>I</em>, or
                     <u>U</u> buttons to format easily!</span>
             </div>
@@ -146,14 +156,14 @@
                     </button>
                 </div>
 
-                <!-- 3. Open Document / PDF -->
+                <!-- 3. Open Resume Document -->
                 <div class="action-card" id="card-open-pdf">
                     <div class="action-card-icon open-pdf-icon">
                         <i class="fas fa-folder-open"></i>
                     </div>
                     <div class="action-card-info">
-                        <h4>Open Resume / PDF</h4>
-                        <p>Browse saved resumes from database, import backup files, or view PDF.</p>
+                        <h4>Open Resume</h4>
+                        <p>Browse saved resumes from browser database or import a .resume project file.</p>
                     </div>
                     <button type="button" class="action-btn open-pdf-btn" id="open-pdf-btn">
                         <i class="fas fa-folder-open"></i> Open...
@@ -174,14 +184,29 @@
                     </button>
                 </div>
 
-                <!-- 5. Export Project File (.json) -->
+                <!-- 5. Standalone PDF View -->
+                <div class="action-card" id="card-standalone-pdf">
+                    <div class="action-card-icon standalone-pdf-icon">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                    <div class="action-card-info">
+                        <h4>Standalone PDF View</h4>
+                        <p>Open in a dedicated distraction-free window with strict A4 dimensions and quick print.</p>
+                    </div>
+                    <button type="button" class="action-btn" id="open-standalone-pdf-btn"
+                        style="background:#e0f2fe; color:#0369a1;">
+                        <i class="fas fa-external-link-alt"></i> Open View
+                    </button>
+                </div>
+
+                <!-- 6. Export Project File (.resume) -->
                 <div class="action-card" id="card-export-json">
                     <div class="action-card-icon export-json-icon">
                         <i class="fas fa-file-export"></i>
                     </div>
                     <div class="action-card-info">
                         <h4>Export Project Backup</h4>
-                        <p>Download full resume project data (.json) to save on your computer.</p>
+                        <p>Download full resume project data (.resume) to save on your computer.</p>
                     </div>
                     <button type="button" class="action-btn" id="export-json-btn"
                         style="background:#e0e7ff; color:#3730a3;">
@@ -190,8 +215,7 @@
                 </div>
 
             </div>
-            <div class="modal-footer"
-                style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+            <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="actions-modal-cancel">Close</button>
             </div>
         </div>
@@ -213,9 +237,6 @@
                 </button>
                 <button type="button" class="open-doc-tab" id="tab-btn-import">
                     <i class="fas fa-file-import"></i> Import / Open File
-                </button>
-                <button type="button" class="open-doc-tab" id="tab-btn-preview-pdf">
-                    <i class="fas fa-external-link-alt"></i> Standalone PDF View
                 </button>
             </div>
 
@@ -240,34 +261,18 @@
             <div class="open-doc-tab-panel" id="panel-import-file" style="display: none;">
                 <div class="import-dropzone" id="import-dropzone">
                     <i class="fas fa-cloud-upload-alt import-icon"></i>
-                    <h3>Select or Drop a Resume Project File (.json / .resume)</h3>
-                    <p>Load an exported resume project file to restore full editable content, photos, and signatures, or
-                        select a PDF file to open in viewer.</p>
+                    <h3>Select or Drop a Resume Project File (.resume / .json)</h3>
+                    <p>Load an exported resume project file to restore full editable content, photos, and signatures.</p>
                     <div class="import-actions">
                         <button type="button" class="primary-btn" id="import-browse-btn">
                             <i class="fas fa-folder-open"></i> Choose File...
                         </button>
-                        <input type="file" id="import-file-input" accept=".json,.resume,.pdf" style="display: none;">
+                        <input type="file" id="import-file-input" accept=".resume,.json,.pdf" style="display: none;">
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 3: Standalone PDF Viewer Launch -->
-            <div class="open-doc-tab-panel" id="panel-preview-pdf" style="display: none;">
-                <div class="pdf-tab-intro">
-                    <div class="pdf-tab-icon"><i class="fas fa-file-pdf"></i></div>
-                    <h3>Standalone PDF Print Window</h3>
-                    <p>Open the current resume in a separate distraction-free browser window configured with strict A4
-                        dimensions and one-click PDF print/save.</p>
-                    <button type="button" class="primary-btn" id="open-standalone-pdf-window-btn"
-                        style="padding: 10px 20px; font-size: 14px;">
-                        <i class="fas fa-external-link-alt"></i> Open Standalone PDF Preview
-                    </button>
-                </div>
-            </div>
-
-            <div class="modal-footer"
-                style="margin-top: 18px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+            <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="open-doc-modal-cancel">Close</button>
             </div>
         </div>
@@ -316,7 +321,7 @@
                     Your current resume remains safely saved in your browser history and can be reopened anytime from
                     <strong>Menu &gt; Open Resume / PDF</strong>.
                 </p>
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
                     <button type="button" class="primary-btn" id="reset-modal-confirm-blank"
                         style="padding: 10px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fas fa-file"></i> Start with Clean Blank Format
@@ -326,8 +331,97 @@
                         <i class="fas fa-user-edit"></i> Load Sample Template
                     </button>
                 </div>
-                <div style="display: flex; justify-content: flex-end;">
-                    <button type="button" class="btn-secondary" id="reset-modal-cancel">Cancel</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="reset-modal-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome / First-Visit Onboarding Modal -->
+    <div id="welcome-onboard-modal" class="modal-backdrop hide-on-print" style="display: none;">
+        <div class="modal-box welcome-modal-box">
+            <button type="button" class="modal-close-btn welcome-close-btn" id="welcome-modal-close" aria-label="Close">&times;</button>
+            <div class="welcome-modal-grid">
+                <!-- Left Column: Branding, Privacy & Github Info -->
+                <div class="welcome-info-col">
+                    <div>
+                        <div class="welcome-header">
+                            <div class="brand-logo-icon welcome-brand-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <div>
+                                <h2 class="welcome-title">Welcome to Resu-maker</h2>
+                                <div class="welcome-byline">by DNL &middot; Browser-Based Resume Editor</div>
+                            </div>
+                        </div>
+
+                        <div class="welcome-privacy-banner">
+                            <div class="welcome-privacy-item">
+                                <i class="fas fa-user-shield"></i>
+                                <div>
+                                    <strong>No Registration or Login Required</strong>
+                                    <p>Start crafting your resume instantly. No accounts, sign-ups, or cloud tracking.</p>
+                                </div>
+                            </div>
+                            <div class="welcome-privacy-item">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <strong>100% Private & Local Storage</strong>
+                                    <p>All your information, photos, and signatures stay stored safely in your browser database.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="welcome-footer">
+                        <div class="welcome-footer-author">
+                            <i class="fab fa-github"></i>
+                            <span>dnsalcedo01 / DNL</span>
+                        </div>
+                        <a href="https://github.com/dnsalcedo01/dnl-resumaker" target="_blank" rel="noopener noreferrer" class="welcome-github-url">
+                            https://github.com/dnsalcedo01/dnl-resumaker
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Getting Started Action Choices -->
+                <div class="welcome-actions-col">
+                    <div class="welcome-actions-title">How would you like to begin?</div>
+                    <div class="welcome-actions-list">
+                        <button type="button" class="welcome-action-card" id="welcome-open-doc-btn">
+                            <div class="welcome-action-icon welcome-icon-blue">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="welcome-action-text">
+                                <h4>Open Resume / File</h4>
+                                <p>Browse saved resumes from browser database or import a .resume project file.</p>
+                            </div>
+                            <i class="fas fa-arrow-right welcome-action-arrow"></i>
+                        </button>
+
+                        <button type="button" class="welcome-action-card" id="welcome-sample-btn">
+                            <div class="welcome-action-icon welcome-icon-green">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="welcome-action-text">
+                                <h4>Load Sample Resume</h4>
+                                <p>Explore an IT specialist pre-filled resume and edit details as you go.</p>
+                            </div>
+                            <i class="fas fa-arrow-right welcome-action-arrow"></i>
+                        </button>
+
+                        <button type="button" class="welcome-action-card" id="welcome-blank-btn">
+                            <div class="welcome-action-icon welcome-icon-slate">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="welcome-action-text">
+                                <h4>Start Blank Resume</h4>
+                                <p>Begin with a clean document layout equipped with helpful placeholder guides.</p>
+                            </div>
+                            <i class="fas fa-arrow-right welcome-action-arrow"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
