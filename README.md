@@ -1,11 +1,14 @@
 # Resu-maker `by DNL`
 
+![Resu-maker Welcome Onboarding](Resu-maker_onboard-welcome.jpeg)
+**Resu-maker Welcome Onboarding**
+
+![Resu-maker Homepage/Editor](Resu-maker_editor-home.jpeg)
+**Resu-maker Homepage/Editor**
+
 A simple, lightweight single-page resume maker created for IT students, beginners, and tech professionals looking for a clean and straightforward resume layout.
 
 ---
-
-![Resu-maker Homepage/Editor](Resu-maker_editor_home.jpeg)
-**Resu-maker Homepage/Editor**
 
 ## 📌 About
 
