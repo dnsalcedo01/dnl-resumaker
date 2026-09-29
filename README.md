@@ -12,9 +12,10 @@ A simple, lightweight single-page resume maker created for IT students, beginner
 
 ## 📌 About
 
-**Resu-maker by DNL** is a simple, browser-based resume editor. It is designed to help you create a single-page A4 resume without complicated tools or subscriptions. 
+**Resu-maker by DNL** is a simple, browser-based resume editor designed to help you build a clean, single-page A4 resume without complicated tools or subscriptions.
 
-If you like a clean, practical layout where everything fits onto one page, this editor is built for that format.
+* **No Login or Registration Required:** Resu-maker runs directly in your browser. There is no account creation, tracking, or cloud lock-in.
+* **100% Local & Private:** All your resume information, uploaded photos, and digital signatures are saved locally in your browser's database (IndexedDB & LocalStorage). Nothing is transmitted to external servers.
 
 ---
 
@@ -39,13 +40,15 @@ The resume layout is structured simply and practically:
 ## ✨ Basic Functions
 
 * **Live Preview:** See changes in real-time as you fill out the editor form.
-* **Auto-Save:** Saves your changes locally in your browser (IndexedDB & LocalStorage), with a real-time status indicator.
+* **Auto-Save & Local Database:** Automatically saves and catalogs multiple resumes locally in your browser (IndexedDB & LocalStorage).
 * **Text Formatting:** Quick buttons to format text with **bold**, *italics*, or <u>underline</u>.
-* **Photo & Signature Upload:** Add a formal photo, upload a digital signature, and adjust signature size and positioning.
-* **JSON Backup & Restore:** Export your resume data to a `.json` file to back it up or transfer it to another computer.
+* **Photo & Signature Upload:** Add a formal 1:1 photo, upload a digital signature, and adjust signature size and positioning with natural overlap.
+* **Curated Color Palettes:** Choose from 4 high-contrast, paper-legible palettes (Classic Navy & Amber, Forest Emerald & Teal, Executive Burgundy & Bronze, Modern Graphite & Slate) that harmonize headings, accents, icons, and background patterns.
+* **Selectable Header Patterns:** Choose between 3 original clean-room vector graphics (Concentric Dots, Honeycomb, Wavy Curves) or a plain minimalist layout.
+* **.resume Project Backup & Restore:** Export full resume project data to a `.resume` file (or import `.resume`/`.json` files) to easily transfer between computers.
+* **Standalone PDF View:** Open your resume in a dedicated distraction-free browser window configured with exact A4 dimensions and quick print access.
 * **PDF Export:** Print or save directly to PDF using your browser's print dialog.
-* **Selectable Header Patterns:** Choose between clean original vector backgrounds (Concentric Dots, Honeycomb, Wavy Curves) or a minimal white layout.
-* **Blank & Sample Templates:** Reset to a blank template with guide placeholders or restore sample data anytime.
+* **Blank & Sample Templates:** Start fresh with a clean blank template with guide placeholders or restore the sample template anytime.
 
 ---
 
