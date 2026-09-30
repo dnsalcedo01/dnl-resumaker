@@ -1162,7 +1162,8 @@ function renderPreview() {
     if (!preview) return;
 
     const pattern = state.backgroundPattern || 'dots';
-    const colorTheme = state.colorTheme || 'navy';
+    let colorTheme = state.colorTheme || 'navy';
+    if (colorTheme === 'burgundy') colorTheme = 'terracotta';
     preview.className = `resume-page bg-${pattern} theme-${colorTheme}`;
 
     const hasContact = state.personal.phone || state.personal.email || state.personal.website ||
@@ -1889,7 +1890,8 @@ function renderEditor() {
     // 0.A COLOR PALETTE & THEME SECTION
     const paletteSec = document.createElement('div');
     paletteSec.className = 'form-section';
-    const currentTheme = state.colorTheme || 'navy';
+    let currentTheme = state.colorTheme || 'navy';
+    if (currentTheme === 'burgundy') currentTheme = 'terracotta';
     paletteSec.innerHTML = `
         <div class="section-header">
             <div class="section-header-left">
@@ -1911,36 +1913,36 @@ function renderEditor() {
                     </div>
                     <i class="fas fa-check palette-active-check"></i>
                 </button>
-                <button type="button" class="palette-option-card ${currentTheme === 'emerald' ? 'active' : ''}" data-theme="emerald" title="Forest Emerald & Teal">
+                <button type="button" class="palette-option-card ${currentTheme === 'emerald' ? 'active' : ''}" data-theme="emerald" title="Forest Emerald & Jade Mint">
                     <div class="palette-swatch-box">
                         <div class="palette-swatch-primary" style="background: #065f46;"></div>
-                        <div class="palette-swatch-secondary" style="background: #0d9488;"></div>
+                        <div class="palette-swatch-secondary" style="background: #059669;"></div>
                     </div>
                     <div class="palette-option-info">
                         <span class="palette-option-name">Forest Emerald</span>
-                        <span class="palette-option-desc">Deep emerald & teal</span>
+                        <span class="palette-option-desc">Emerald & jade mint</span>
                     </div>
                     <i class="fas fa-check palette-active-check"></i>
                 </button>
-                <button type="button" class="palette-option-card ${currentTheme === 'burgundy' ? 'active' : ''}" data-theme="burgundy" title="Executive Burgundy & Bronze">
+                <button type="button" class="palette-option-card ${currentTheme === 'terracotta' ? 'active' : ''}" data-theme="terracotta" title="Warm Terracotta & Amber Gold">
                     <div class="palette-swatch-box">
-                        <div class="palette-swatch-primary" style="background: #881337;"></div>
-                        <div class="palette-swatch-secondary" style="background: #c2410c;"></div>
+                        <div class="palette-swatch-primary" style="background: #9a3412;"></div>
+                        <div class="palette-swatch-secondary" style="background: #d97706;"></div>
                     </div>
                     <div class="palette-option-info">
-                        <span class="palette-option-name">Burgundy Wine</span>
-                        <span class="palette-option-desc">Rich wine & bronze</span>
+                        <span class="palette-option-name">Warm Terracotta</span>
+                        <span class="palette-option-desc">Terracotta & amber</span>
                     </div>
                     <i class="fas fa-check palette-active-check"></i>
                 </button>
-                <button type="button" class="palette-option-card ${currentTheme === 'slate' ? 'active' : ''}" data-theme="slate" title="Modern Graphite & Slate">
+                <button type="button" class="palette-option-card ${currentTheme === 'slate' ? 'active' : ''}" data-theme="slate" title="Obsidian Charcoal & Electric Cobalt">
                     <div class="palette-swatch-box">
-                        <div class="palette-swatch-primary" style="background: #1e293b;"></div>
-                        <div class="palette-swatch-secondary" style="background: #475569;"></div>
+                        <div class="palette-swatch-primary" style="background: #0f172a;"></div>
+                        <div class="palette-swatch-secondary" style="background: #2563eb;"></div>
                     </div>
                     <div class="palette-option-info">
-                        <span class="palette-option-name">Graphite Slate</span>
-                        <span class="palette-option-desc">Charcoal & steel slate</span>
+                        <span class="palette-option-name">Obsidian Cobalt</span>
+                        <span class="palette-option-desc">Charcoal & electric cobalt</span>
                     </div>
                     <i class="fas fa-check palette-active-check"></i>
                 </button>
