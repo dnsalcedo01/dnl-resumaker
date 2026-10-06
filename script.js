@@ -894,7 +894,7 @@ async function renderSavedDocsList(filterText = '') {
         container.innerHTML = `
             <div class="empty-docs-state">
                 <i class="fas fa-folder-open"></i>
-                <p>${query ? 'No matching saved resumes found.' : 'No saved resumes yet in database. Click "Save as New Copy" or Save Progress to add one!'}</p>
+                <p>${escapeHTML(query) ? 'No matching saved resumes found.' : 'No saved resumes yet in database. Click "Save as New Copy" or Save Progress to add one!'}</p>
             </div>
         `;
         return;
@@ -911,32 +911,68 @@ async function renderSavedDocsList(filterText = '') {
                 <div class="saved-doc-main">
                     <div class="saved-doc-title">
                         <i class="fas fa-file-alt" style="color: var(--primary-color);"></i>
-                        <span>${escapeHtml(doc.title || 'Untitled Resume')}</span>
+                        <span>${escapeHTML(doc.title || 'Untitled Resume')}</span>
                         ${isActive ? '<span class="saved-doc-badge">Current</span>' : ''}
                     </div>
                     <div class="saved-doc-meta">
-                        <span><i class="far fa-clock"></i> ${dateStr}</span>
+                        <span><i class="far fa-clock"></i> ${escapeHTML(dateStr)}</span>
                     </div>
                 </div>
                 <div class="saved-doc-actions">
-                    <button type="button" class="saved-doc-btn saved-doc-open-btn" onclick="openSavedDocument('${doc.id}')" title="Open this resume in editor">
+                    <button type="button" class="saved-doc-btn saved-doc-open-btn" data-action="open" data-id="${escapeHTML(doc.id)}" title="Open this resume in editor">
                         <i class="fas fa-folder-open"></i> Open
                     </button>
-                    <button type="button" class="saved-doc-btn saved-doc-export-btn" onclick="exportSpecificDoc('${doc.id}')" title="Download backup file">
+                    <button type="button" class="saved-doc-btn saved-doc-export-btn" data-action="export" data-id="${escapeHTML(doc.id)}" title="Download backup file">
                         <i class="fas fa-download"></i>
                     </button>
-                    <button type="button" class="saved-doc-btn saved-doc-delete-btn" onclick="deleteSavedDocument('${doc.id}')" title="Delete from storage">
+                    <button type="button" class="saved-doc-btn saved-doc-delete-btn" data-action="delete" data-id="${escapeHTML(doc.id)}" title="Delete from storage">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Secure event delegation (avoids inline onclick attributes)
+    container.onclick = (e) => {
+        const btn = e.target.closest('.saved-doc-btn');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if (!id) return;
+        if (action === 'open') {
+            openSavedDocument(id);
+        } else if (action === 'export') {
+            exportSpecificDoc(id);
+        } else if (action === 'delete') {
+            deleteSavedDocument(id);
+        }
+    };
 }
 
-function escapeHtml(text) {
-    if (!text) return '';
-    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+/**
+ * Security & Sanitization Helpers
+ */
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+const escapeHtml = escapeHTML;
+
+function sanitizeUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    // Allow safe protocols: http, https, data:image/, blob:, or relative paths
+    if (/^(https?:\/\/|data:image\/|blob:|\/|\.\/)/i.test(trimmed)) {
+        return escapeHTML(trimmed);
+    }
+    return '';
 }
 
 /**
@@ -1117,10 +1153,10 @@ function triggerAutoSave() {
     }, 700);
 }
 
-// --- RICH TEXT PARSER (BOLD, ITALIC, UNDERLINE) ---
+// --- RICH TEXT PARSER (BOLD, ITALIC, UNDERLINE WITH HTML SANITIZATION) ---
 function parseMarkdown(text) {
     if (!text) return "";
-    return text
+    return escapeHTML(String(text))
         .replace(/\*\*\*([\s\S]*?)\*\*\*/g, '<strong><em>$1</em></strong>') // ***bold italic***
         .replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>')       // **bold**
         .replace(/__([\s\S]*?)__/g, '<u>$1</u>')                     // __underline__
@@ -1208,7 +1244,7 @@ function renderPreview() {
             </div>
             ${state.personal.photoUrl ? `
                 <div class="cv-photo-container">
-                    <img src="${state.personal.photoUrl}" alt="Formal Photo" class="cv-photo" id="cv-rendered-photo">
+                    <img src="${sanitizeUrl(state.personal.photoUrl)}" alt="Formal Photo" class="cv-photo" id="cv-rendered-photo">
                 </div>
             ` : ''}
         </header>
@@ -1230,7 +1266,7 @@ function renderPreview() {
                         ${state.education.map(edu => `
                             <div class="cv-edu-item">
                                 <div class="cv-edu-logo">
-                                    ${edu.logoUrl ? `<img src="${edu.logoUrl}" alt="Logo" class="cv-custom-logo">` : (edu.logoType && LOGOS[edu.logoType] ? LOGOS[edu.logoType] : `<div class="cv-edu-logo-placeholder" title="No logo uploaded"><i class="fas fa-university"></i></div>`)}
+                                    ${edu.logoUrl ? `<img src="${sanitizeUrl(edu.logoUrl)}" alt="Logo" class="cv-custom-logo">` : (edu.logoType && LOGOS[edu.logoType] ? LOGOS[edu.logoType] : `<div class="cv-edu-logo-placeholder" title="No logo uploaded"><i class="fas fa-university"></i></div>`)}
                                 </div>
                                 <div class="cv-edu-details">
                                     <div class="cv-edu-title">${edu.title ? parseMarkdown(edu.title) : '<span class="cv-placeholder-guide">Degree / Qualification Title</span>'}</div>
@@ -1252,7 +1288,7 @@ function renderPreview() {
                         ${state.volunteering.map(vol => `
                             <div class="cv-vol-item">
                                 <div class="cv-vol-logo">
-                                    ${vol.logoUrl ? `<img src="${vol.logoUrl}" alt="Logo" class="cv-custom-logo">` : (vol.logoType && LOGOS[vol.logoType] ? LOGOS[vol.logoType] : `<div class="cv-edu-logo-placeholder" title="No logo uploaded"><i class="fas fa-building"></i></div>`)}
+                                    ${vol.logoUrl ? `<img src="${sanitizeUrl(vol.logoUrl)}" alt="Logo" class="cv-custom-logo">` : (vol.logoType && LOGOS[vol.logoType] ? LOGOS[vol.logoType] : `<div class="cv-edu-logo-placeholder" title="No logo uploaded"><i class="fas fa-building"></i></div>`)}
                                 </div>
                                 <div class="cv-vol-details">
                                     <div class="cv-vol-title">${vol.title ? parseMarkdown(vol.title) : '<span class="cv-placeholder-guide">Job Title / Role</span>'}</div>
@@ -1304,7 +1340,7 @@ function renderPreview() {
                         ${state.interests.map(item => `
                             <div class="cv-interest-item">
                                 <div class="cv-interest-header">
-                                    <i class="${item.icon || 'fas fa-star'} cv-interest-icon"></i>
+                                    <i class="${escapeHTML(item.icon || 'fas fa-star')} cv-interest-icon"></i>
                                     <span class="cv-interest-title">${item.title ? parseMarkdown(item.title) : '<span class="cv-placeholder-guide">Interest Area</span>'}</span>
                                 </div>
                                 <div class="cv-interest-desc">${item.description ? parseMarkdown(item.description) : '<span class="cv-placeholder-guide">Short description of interest...</span>'}</div>
@@ -1320,7 +1356,7 @@ function renderPreview() {
                         ${state.projects.map(proj => `
                             <div class="cv-project-item">
                                 <div class="cv-project-header">
-                                    <i class="${proj.icon || 'far fa-window-maximize'} cv-project-icon"></i>
+                                    <i class="${escapeHTML(proj.icon || 'far fa-window-maximize')} cv-project-icon"></i>
                                     <span class="cv-project-pill">${proj.title ? parseMarkdown(proj.title) : '<span class="cv-placeholder-guide">Project Name</span>'}</span>
                                 </div>
                                 <div class="cv-project-desc">${proj.description ? parseMarkdown(proj.description) : '<span class="cv-placeholder-guide">Brief description of project goals and achievements...</span>'}</div>
@@ -1334,7 +1370,7 @@ function renderPreview() {
                     <div class="cv-certification-container">
                         ${state.signature.url ? `
                             <div class="cv-signature-wrapper" id="cv-sig-wrapper" style="margin-bottom: ${state.signature.overlap !== undefined ? state.signature.overlap : -16}px;">
-                                <img src="${state.signature.url}" alt="Signature" class="cv-signature-img" id="cv-rendered-sig" style="width: ${state.signature.width || 150}px;" title="Cursive Digital Signature (Scroll mouse wheel to resize)">
+                                <img src="${sanitizeUrl(state.signature.url)}" alt="Signature" class="cv-signature-img" id="cv-rendered-sig" style="width: ${state.signature.width || 150}px;" title="Cursive Digital Signature (Scroll mouse wheel to resize)">
                             </div>
                         ` : ''}
                         <div class="cv-certification-text">${parseMarkdown(state.signature.text || "I hereby certify that all of the information\nwritten here are true and correct.")}</div>
@@ -1499,7 +1535,7 @@ function renderIconGrid(filterText) {
     });
 
     if (filtered.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 20px;">No icons found matching "${filterText}".</div>`;
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 20px;">No icons found matching "${escapeHTML(filterText)}".</div>`;
     }
 }
 
@@ -1799,7 +1835,7 @@ function createFormGroup(label, value, onChange, type = 'text', onIconPick = nul
 
         const previewBadge = document.createElement('div');
         previewBadge.className = 'icon-current-badge';
-        previewBadge.innerHTML = `<i class="${value || 'fas fa-star'}"></i>`;
+        previewBadge.innerHTML = `<i class="${escapeHTML(value || 'fas fa-star')}"></i>`;
         controlRow.appendChild(previewBadge);
 
         const pickBtn = document.createElement('button');
@@ -1809,7 +1845,7 @@ function createFormGroup(label, value, onChange, type = 'text', onIconPick = nul
         pickBtn.onclick = () => {
             if (onIconPick) {
                 onIconPick((chosenClass) => {
-                    previewBadge.innerHTML = `<i class="${chosenClass}"></i>`;
+                    previewBadge.innerHTML = `<i class="${escapeHTML(chosenClass)}"></i>`;
                     onChange(chosenClass);
                 });
             }
@@ -2125,7 +2161,7 @@ function renderEditor() {
     `;
 
     const thumbImg = personalSec.querySelector('#editor-photo-thumb');
-    thumbImg.src = state.personal.photoUrl || DEFAULT_PHOTO;
+    thumbImg.src = sanitizeUrl(state.personal.photoUrl) || DEFAULT_PHOTO;
 
     personalSec.querySelector('.section-header').onclick = (e) => {
         if (!e.target.closest('button')) personalSec.classList.toggle('collapsed');
@@ -2293,7 +2329,7 @@ function renderEditor() {
                 <div class="item-fields">
                     ${sec.hasLogo ? `
                         <div class="item-logo-row">
-                            <img class="item-logo-thumb" src="${item.logoUrl || ''}" style="${item.logoUrl ? '' : 'display:none;'}">
+                            <img class="item-logo-thumb" src="${sanitizeUrl(item.logoUrl || '')}" style="${item.logoUrl ? '' : 'display:none;'}">
                             <button type="button" class="btn-secondary btn-upload-item-logo">
                                 <i class="fas fa-image"></i> ${item.logoUrl ? 'Change Logo' : (sec.key === 'education' ? 'Upload School Logo' : 'Upload Company / Org Logo')}
                             </button>
@@ -2428,7 +2464,7 @@ function renderEditor() {
     };
 
     const sigThumb = certSec.querySelector('#editor-sig-thumb');
-    sigThumb.src = (state.signature && state.signature.url) ? state.signature.url : DEFAULT_SIGNATURE;
+    sigThumb.src = sanitizeUrl((state.signature && state.signature.url) ? state.signature.url : DEFAULT_SIGNATURE) || DEFAULT_SIGNATURE;
 
     certSec.querySelector('#btn-upload-sig').onclick = () => {
         openImagePicker((dataUrl) => {
@@ -2822,9 +2858,9 @@ function openPdfView() {
 </head>
 <body>
     <div class="pdf-viewer-bar">
-        <div class="pdf-viewer-title"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> ${title}</div>
-        <button class="pdf-btn-action" onclick="window.print()"><i class="fas fa-print"></i> Print / Save as PDF</button>
-        <button class="pdf-btn-action pdf-btn-close" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
+        <div class="pdf-viewer-title"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> ${escapeHTML(title)}</div>
+        <button class="pdf-btn-action" id="pdf-print-btn"><i class="fas fa-print"></i> Print / Save as PDF</button>
+        <button class="pdf-btn-action pdf-btn-close" id="pdf-close-btn"><i class="fas fa-times"></i> Close</button>
     </div>
     <div class="pdf-page-container">
         ${resumeHtml}
@@ -2832,6 +2868,10 @@ function openPdfView() {
 </body>
 </html>`);
     newWindow.document.close();
+    const printBtn = newWindow.document.getElementById('pdf-print-btn');
+    if (printBtn) printBtn.addEventListener('click', () => newWindow.print());
+    const closeBtn = newWindow.document.getElementById('pdf-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', () => newWindow.close());
 }
 
 /**
