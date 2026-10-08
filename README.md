@@ -6,6 +6,9 @@
 ![Resu-maker Homepage/Editor](Resu-maker_editor-home.jpeg)
 **Resu-maker Homepage/Editor**
 
+![Resu-maker Design & Palette Section](Resu-maker_editor-design-n-theme.jpeg)
+**Resu-maker Design & Palette Section**
+
 A simple, lightweight single-page resume maker created for IT students, beginners, and tech professionals looking for a clean and straightforward resume layout.
 
 ---
