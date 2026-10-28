@@ -448,35 +448,83 @@ function openImagePicker(callback, maxDimension = 400, quality = 0.88, isSignatu
  * and client-side IndexedDB & LocalStorage synchronization.
  */
 const DB_NAME = 'ResumeEditorDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const DB_STORE_CACHE = 'resume_cache';
 const DB_STORE_DOCUMENTS = 'resumes';
 
+let cachedDB = null;
+let dbPromise = null;
+
 function getDB() {
-    return new Promise((resolve) => {
+    if (cachedDB) {
+        try {
+            if (cachedDB.objectStoreNames.contains(DB_STORE_CACHE) &&
+                cachedDB.objectStoreNames.contains(DB_STORE_DOCUMENTS)) {
+                return Promise.resolve(cachedDB);
+            }
+            cachedDB.close();
+        } catch (e) { }
+        cachedDB = null;
+    }
+
+    if (dbPromise) return dbPromise;
+
+    dbPromise = new Promise((resolve) => {
         if (!window.indexedDB) {
             resolve(null);
             return;
         }
-        const req = indexedDB.open(DB_NAME, DB_VERSION);
-        req.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains(DB_STORE_CACHE)) {
-                db.createObjectStore(DB_STORE_CACHE);
-            }
-            if (!db.objectStoreNames.contains(DB_STORE_DOCUMENTS)) {
-                db.createObjectStore(DB_STORE_DOCUMENTS, { keyPath: 'id' });
-            }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => resolve(null);
+        try {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(DB_STORE_CACHE)) {
+                    db.createObjectStore(DB_STORE_CACHE);
+                }
+                if (!db.objectStoreNames.contains(DB_STORE_DOCUMENTS)) {
+                    db.createObjectStore(DB_STORE_DOCUMENTS, { keyPath: 'id' });
+                }
+            };
+            req.onsuccess = () => {
+                cachedDB = req.result;
+                cachedDB.onversionchange = () => {
+                    try { cachedDB.close(); } catch (e) { }
+                    cachedDB = null;
+                    dbPromise = null;
+                };
+                cachedDB.onclose = () => {
+                    cachedDB = null;
+                    dbPromise = null;
+                };
+                resolve(cachedDB);
+            };
+            req.onerror = (e) => {
+                console.warn('IndexedDB open error:', e);
+                resolve(null);
+            };
+            req.onblocked = (e) => {
+                console.warn('IndexedDB version upgrade blocked by another connection:', e);
+                resolve(req.result || null);
+            };
+        } catch (err) {
+            console.warn('IndexedDB exception:', err);
+            resolve(null);
+        }
+    }).finally(() => {
+        dbPromise = null;
     });
+
+    return dbPromise;
 }
 
 async function saveToDB(storeName, keyOrVal, val) {
     try {
         const db = await getDB();
         if (!db) return false;
+        if (!db.objectStoreNames.contains(storeName)) {
+            console.warn(`Object store "${storeName}" not found in ${DB_NAME}`);
+            return false;
+        }
         return new Promise((resolve) => {
             const tx = db.transaction(storeName, 'readwrite');
             const store = tx.objectStore(storeName);
@@ -486,9 +534,14 @@ async function saveToDB(storeName, keyOrVal, val) {
                 store.put(keyOrVal);
             }
             tx.oncomplete = () => resolve(true);
-            tx.onerror = () => resolve(false);
+            tx.onerror = (e) => {
+                console.warn(`Error writing to ${storeName}:`, e);
+                resolve(false);
+            };
+            tx.onabort = () => resolve(false);
         });
     } catch (e) {
+        console.warn(`Exception in saveToDB(${storeName}):`, e);
         return false;
     }
 }
@@ -497,6 +550,7 @@ async function loadFromDB(storeName, key) {
     try {
         const db = await getDB();
         if (!db) return null;
+        if (!db.objectStoreNames.contains(storeName)) return null;
         return new Promise((resolve) => {
             const tx = db.transaction(storeName, 'readonly');
             const req = tx.objectStore(storeName).get(key);
@@ -512,6 +566,7 @@ async function getAllFromDB(storeName) {
     try {
         const db = await getDB();
         if (!db) return [];
+        if (!db.objectStoreNames.contains(storeName)) return [];
         return new Promise((resolve) => {
             const tx = db.transaction(storeName, 'readonly');
             const req = tx.objectStore(storeName).getAll();
@@ -527,6 +582,7 @@ async function deleteFromDB(storeName, key) {
     try {
         const db = await getDB();
         if (!db) return false;
+        if (!db.objectStoreNames.contains(storeName)) return false;
         return new Promise((resolve) => {
             const tx = db.transaction(storeName, 'readwrite');
             tx.objectStore(storeName).delete(key);
@@ -598,7 +654,31 @@ async function saveToLocalStorage(showAlert = true) {
         localStorage.setItem('resume_editor_active_id', state.id);
         savedLocal = true;
     } catch (e) {
-        console.warn('LocalStorage quota limit reached:', e);
+        console.warn('LocalStorage active data quota limit reached:', e);
+    }
+
+    // 3. Mirror document into LocalStorage catalog backup for bulletproof redundancy
+    try {
+        const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+        let backupDocs = backupRaw ? JSON.parse(backupRaw) : [];
+        if (!Array.isArray(backupDocs)) backupDocs = [];
+        const idx = backupDocs.findIndex(d => d.id === docRecord.id);
+        if (idx >= 0) {
+            backupDocs[idx] = docRecord;
+        } else {
+            backupDocs.unshift(docRecord);
+        }
+        localStorage.setItem('resume_docs_catalog_backup', JSON.stringify(backupDocs));
+    } catch (e) {
+        try {
+            const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+            let backupDocs = backupRaw ? JSON.parse(backupRaw) : [];
+            const lightRecord = { id: docRecord.id, title: docRecord.title, updatedAt: docRecord.updatedAt };
+            const idx = backupDocs.findIndex(d => d.id === docRecord.id);
+            if (idx >= 0) backupDocs[idx] = lightRecord;
+            else backupDocs.unshift(lightRecord);
+            localStorage.setItem('resume_docs_catalog_backup', JSON.stringify(backupDocs));
+        } catch (e2) { }
     }
 
     setSaveStatus(true);
@@ -614,36 +694,48 @@ async function saveToLocalStorage(showAlert = true) {
 }
 
 /**
- * Retrieves all saved resume documents from IndexedDB catalog.
+ * Retrieves all saved resume documents from IndexedDB catalog with LocalStorage backup recovery.
  */
 async function getAllSavedDocuments() {
-    let docs = await getAllFromDB(DB_STORE_DOCUMENTS);
-
-    // Auto-migration: only run on very first launch if catalog has NEVER been initialized
-    const hasInitializedCatalog = localStorage.getItem('dnl_catalog_initialized') === 'true';
-    if (!hasInitializedCatalog && (!docs || docs.length === 0)) {
-        let legacy = await loadFromDB(DB_STORE_CACHE, 'current_resume');
-        if (!legacy) {
-            try {
-                const ls = localStorage.getItem('dnl_resume_data') || localStorage.getItem('resume_editor_active_data');
-                if (ls) legacy = JSON.parse(ls);
-            } catch (e) { }
-        }
-        if (legacy && typeof legacy === 'object') {
-            const firstDoc = {
-                id: legacy.id || 'doc_' + Date.now(),
-                title: legacy.documentTitle || (legacy.personal && legacy.personal.name ? `${legacy.personal.name} - Resume` : 'My Resume'),
-                updatedAt: new Date().toISOString(),
-                data: legacy
-            };
-            await saveToDB(DB_STORE_DOCUMENTS, firstDoc);
-            docs = [firstDoc];
-        }
+    let docs = [];
+    try {
+        docs = await getAllFromDB(DB_STORE_DOCUMENTS);
+    } catch (e) {
+        console.warn('Failed to retrieve docs from IndexedDB:', e);
     }
-    localStorage.setItem('dnl_catalog_initialized', 'true');
+
+    if (!Array.isArray(docs)) docs = [];
+
+    // Check LocalStorage backup catalog to recover any documents missed by IndexedDB
+    try {
+        const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+        if (backupRaw) {
+            const backupDocs = JSON.parse(backupRaw);
+            if (Array.isArray(backupDocs)) {
+                const existingIds = new Set(docs.map(d => d.id));
+                for (const bDoc of backupDocs) {
+                    if (bDoc && bDoc.id && !existingIds.has(bDoc.id)) {
+                        docs.push(bDoc);
+                        // Re-sync back into IndexedDB
+                        saveToDB(DB_STORE_DOCUMENTS, bDoc).catch(() => {});
+                    }
+                }
+            }
+        }
+    } catch (e) { }
+
+    // Keep LocalStorage backup catalog in sync
+    try {
+        localStorage.setItem('resume_docs_catalog_backup', JSON.stringify(docs));
+    } catch (e) {
+        try {
+            const light = docs.map(d => ({ id: d.id, title: d.title, updatedAt: d.updatedAt }));
+            localStorage.setItem('resume_docs_catalog_backup', JSON.stringify(light));
+        } catch (e2) { }
+    }
 
     // Sort by most recently updated
-    return (docs || []).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+    return docs.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
 }
 
 let openDocOrigin = null; // 'welcome' | 'menu' | null
@@ -673,8 +765,8 @@ function closeOpenDocumentModal(documentLoaded = false) {
         } else if (openDocOrigin === 'menu') {
             openActionsModal();
         } else {
-            // If origin not set and database is empty, return to welcome
-            getAllFromDB(DB_STORE_DOCUMENTS).then(docs => {
+            // If origin not set and there are no saved resumes in the database, return to welcome modal
+            getAllSavedDocuments().then(docs => {
                 if (!docs || docs.length === 0) {
                     showWelcomeModal();
                 }
@@ -706,13 +798,27 @@ function switchOpenDocTab(tab) {
  * Switches the active editor to a specific saved document.
  */
 async function openSavedDocument(id) {
-    const doc = await loadFromDB(DB_STORE_DOCUMENTS, id);
+    let doc = await loadFromDB(DB_STORE_DOCUMENTS, id);
+    if (!doc || !doc.data) {
+        // Check LocalStorage backup
+        try {
+            const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+            if (backupRaw) {
+                const backupDocs = JSON.parse(backupRaw);
+                doc = (backupDocs || []).find(d => d.id === id);
+            }
+        } catch (e) { }
+    }
     if (!doc || !doc.data) {
         showToast('Could not locate document!', true);
         return;
     }
     applyLoadedState(doc.data);
     await saveToDB(DB_STORE_CACHE, 'current_resume', state);
+    try {
+        localStorage.setItem('resume_editor_active_data', JSON.stringify(state));
+        localStorage.setItem('resume_editor_active_id', state.id);
+    } catch (e) { }
     showToast(`Loaded "${state.documentTitle}"`);
     closeOpenDocumentModal(true);
 }
@@ -721,34 +827,59 @@ async function openSavedDocument(id) {
  * Deletes a saved document from IndexedDB catalog.
  */
 async function deleteSavedDocument(id) {
-    const doc = await loadFromDB(DB_STORE_DOCUMENTS, id);
+    let doc = await loadFromDB(DB_STORE_DOCUMENTS, id);
+    if (!doc) {
+        try {
+            const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+            if (backupRaw) {
+                const backupDocs = JSON.parse(backupRaw);
+                doc = (backupDocs || []).find(d => d.id === id);
+            }
+        } catch (e) { }
+    }
     const title = doc ? doc.title : 'this document';
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
     await deleteFromDB(DB_STORE_DOCUMENTS, id);
+
+    // Remove from LocalStorage backup catalog
+    try {
+        const backupRaw = localStorage.getItem('resume_docs_catalog_backup');
+        if (backupRaw) {
+            let backupDocs = JSON.parse(backupRaw);
+            if (Array.isArray(backupDocs)) {
+                backupDocs = backupDocs.filter(d => d.id !== id);
+                localStorage.setItem('resume_docs_catalog_backup', JSON.stringify(backupDocs));
+            }
+        }
+    } catch (e) { }
+
     showToast(`Deleted "${title}"`);
 
-    // If deleted the active document, load another or clean fresh template
+    const remaining = await getAllSavedDocuments();
+
+    if (!remaining || remaining.length === 0) {
+        // All saved resumes have been deleted / user has reset the builder
+        await deleteFromDB(DB_STORE_CACHE, 'current_resume');
+        try {
+            localStorage.removeItem('resume_editor_active_data');
+            localStorage.removeItem('resume_editor_active_id');
+            localStorage.removeItem('resume_docs_catalog_backup');
+        } catch (e) { }
+        applyLoadedState(defaultState);
+        closeOpenDocumentModal(true);
+        showWelcomeModal();
+        return;
+    }
+
+    // If deleted the active document, load next available saved resume
     if (state.id === id) {
-        const remaining = await getAllSavedDocuments();
-        if (remaining && remaining.length > 0) {
-            applyLoadedState(remaining[0].data);
-            await saveToDB(DB_STORE_CACHE, 'current_resume', state);
-            try {
-                localStorage.setItem('resume_editor_active_data', JSON.stringify(state));
-                localStorage.setItem('resume_editor_active_id', state.id);
-            } catch (e) { }
-        } else {
-            const freshState = JSON.parse(JSON.stringify(BLANK_TEMPLATE_STATE));
-            freshState.id = 'doc_' + Date.now();
-            freshState.documentTitle = 'Untitled Resume';
-            applyLoadedState(freshState);
-            await saveToDB(DB_STORE_CACHE, 'current_resume', freshState);
-            try {
-                localStorage.setItem('resume_editor_active_data', JSON.stringify(freshState));
-                localStorage.setItem('resume_editor_active_id', freshState.id);
-            } catch (e) { }
-        }
+        applyLoadedState(remaining[0].data);
+        await saveToDB(DB_STORE_CACHE, 'current_resume', state);
+        try {
+            localStorage.setItem('resume_editor_active_data', JSON.stringify(state));
+            localStorage.setItem('resume_editor_active_id', state.id);
+        } catch (e) { }
     }
     renderSavedDocsList();
 }
@@ -823,7 +954,10 @@ function importResumeFromJsonFile(file) {
             const parsed = JSON.parse(e.target.result);
             if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON format');
 
-            parsed.id = 'doc_' + Date.now();
+            // Preserve ID if valid, or create a unique ID
+            if (!parsed.id) {
+                parsed.id = 'doc_' + Date.now();
+            }
             if (!parsed.documentTitle) {
                 parsed.documentTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ') || 'Imported Resume';
             }
@@ -1005,36 +1139,61 @@ function closeActionsModal() {
  * Loads saved state on application startup.
  */
 async function loadSavedData() {
-    let loaded = null;
+    let resumeToRestore = null;
 
-    // 1. Check IndexedDB active cache
-    try {
-        const fromDB = await loadFromDB(DB_STORE_CACHE, 'current_resume');
-        if (fromDB && typeof fromDB === 'object') {
-            loaded = fromDB;
-        }
-    } catch (e) { }
+    // 1. Retrieve saved documents catalog
+    const docs = await getAllSavedDocuments();
 
-    // 2. Check LocalStorage fallback
-    if (!loaded) {
+    // If saved resumes exist in the catalog, restore the active or latest resume
+    if (docs && docs.length > 0) {
+        // Check IndexedDB active cache
         try {
-            const saved = localStorage.getItem('resume_editor_active_data') || localStorage.getItem('dnl_resume_data');
-            if (saved) {
-                loaded = JSON.parse(saved);
+            const fromDB = await loadFromDB(DB_STORE_CACHE, 'current_resume');
+            if (fromDB && typeof fromDB === 'object' && fromDB.personal) {
+                resumeToRestore = fromDB;
             }
         } catch (e) { }
+
+        // Check LocalStorage fallback
+        if (!resumeToRestore) {
+            try {
+                const saved = localStorage.getItem('resume_editor_active_data') || localStorage.getItem('dnl_resume_data');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed === 'object' && parsed.personal) {
+                        resumeToRestore = parsed;
+                    }
+                }
+            } catch (e) { }
+        }
+
+        // Match active document ID from LocalStorage in docs
+        const activeId = localStorage.getItem('resume_editor_active_id');
+        if (activeId) {
+            const matched = docs.find(d => d.id === activeId);
+            if (matched && matched.data) {
+                if (!resumeToRestore || (matched.updatedAt && new Date(matched.updatedAt) >= new Date(resumeToRestore.updatedAt || 0))) {
+                    resumeToRestore = matched.data;
+                }
+            }
+        }
+
+        // Fallback to the latest saved document in catalog
+        if (!resumeToRestore && docs[0].data) {
+            resumeToRestore = docs[0].data;
+        }
     }
 
-    // 3. Check saved document library catalog
-    let docs = [];
-    try {
-        docs = await getAllFromDB(DB_STORE_DOCUMENTS);
-    } catch (e) { }
-
-    if (loaded && docs && docs.length > 0) {
-        applyLoadedState(loaded);
+    // 2. Apply state or show welcome onboard modal
+    if (resumeToRestore) {
+        applyLoadedState(resumeToRestore);
+        saveToDB(DB_STORE_CACHE, 'current_resume', resumeToRestore).catch(() => {});
+        try {
+            localStorage.setItem('resume_editor_active_data', JSON.stringify(resumeToRestore));
+            localStorage.setItem('resume_editor_active_id', resumeToRestore.id || state.id);
+        } catch (e) { }
     } else {
-        // First-time visit, no saved resume yet, or cleared database
+        // No saved resumes in catalog (first-time visit or user that reset the builder / deleted all resumes)
         applyLoadedState(defaultState);
         showWelcomeModal();
     }
