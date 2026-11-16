@@ -2876,7 +2876,11 @@ function openPdfView() {
     const previewEl = document.getElementById('resume-preview');
     if (!previewEl) return;
 
-    const resumeHtml = previewEl.outerHTML;
+    // Clone element and reset inline scale / transform styling for standalone view
+    const clone = previewEl.cloneNode(true);
+    clone.style.transform = 'none';
+    clone.style.transformOrigin = 'top center';
+    const resumeHtml = clone.outerHTML;
     const title = state.documentTitle || ((state.personal && state.personal.name) ? `${state.personal.name} - Resume` : 'Resume');
 
     const newWindow = window.open('', '_blank');
@@ -2902,12 +2906,14 @@ function openPdfView() {
         html {
             height: auto !important;
             min-height: 100% !important;
-            overflow-y: scroll !important;
-            overflow-x: auto !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
         }
         body {
             margin: 0 !important;
-            padding: 24px 0 100px 0 !important;
+            padding: 24px 16px 100px 16px !important;
             background: #0f172a !important;
             display: flex !important;
             flex-direction: column !important;
@@ -2916,8 +2922,18 @@ function openPdfView() {
             font-family: 'Inter', sans-serif !important;
             height: auto !important;
             min-height: 100vh !important;
-            overflow: visible !important;
-            overflow-y: visible !important;
+            width: 100% !important;
+            overflow-x: hidden !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        /* Completely hide scrollbars on all browsers while preserving smooth scrolling */
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar,
+        *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }
         .pdf-viewer-bar {
             position: sticky;
@@ -2932,7 +2948,8 @@ function openPdfView() {
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            margin-bottom: 24px;
+            margin: 0 auto 24px auto;
+            flex-shrink: 0;
         }
         .pdf-viewer-title {
             color: #f8fafc;
@@ -2969,11 +2986,31 @@ function openPdfView() {
             color: white;
         }
         .pdf-page-container {
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            margin-bottom: 60px;
-            flex-shrink: 0;
+            position: relative !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            width: 210mm !important;
+            max-width: 100% !important;
+            margin: 0 auto 60px auto !important;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+            border-radius: 2px !important;
+            flex-shrink: 0 !important;
+        }
+        /* Override .resume-page absolute positioning to center resume horizontally */
+        .pdf-page-container #resume-preview,
+        .pdf-page-container .resume-page {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            margin: 0 auto !important;
+            transform: none !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            box-shadow: none !important;
+            flex-shrink: 0 !important;
         }
         @media print {
             body {
@@ -2986,8 +3023,13 @@ function openPdfView() {
             }
             .pdf-page-container {
                 box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
             }
-            #resume-preview {
+            #resume-preview,
+            .resume-page {
                 position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
@@ -2998,18 +3040,21 @@ function openPdfView() {
                 padding: 12mm 14mm 12mm 14mm !important;
                 box-shadow: none !important;
                 box-sizing: border-box !important;
+                transform: none !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 overflow: hidden !important;
                 display: flex !important;
                 flex-direction: column !important;
             }
-            #resume-preview::before {
+            #resume-preview::before,
+            .resume-page::before {
                 display: block !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            #resume-preview.bg-none::before {
+            #resume-preview.bg-none::before,
+            .resume-page.bg-none::before {
                 display: none !important;
             }
         }
@@ -3371,10 +3416,35 @@ function setupControls() {
             autoFitZoom();
         }, 120);
     });
-    window.addEventListener('orientationchange', () => {
-        setTimeout(() => {
-            autoFitZoom();
-        }, 200);
+    // Native print event handlers to ensure pristine ISO A4 print output without inline scaling interference
+    window.addEventListener('beforeprint', () => {
+        const preview = document.getElementById('resume-preview');
+        const wrapper = document.getElementById('resume-wrapper');
+        if (preview) {
+            preview.dataset.savedTransform = preview.style.transform;
+            preview.style.transform = 'none';
+        }
+        if (wrapper) {
+            wrapper.dataset.savedWidth = wrapper.style.width;
+            wrapper.dataset.savedHeight = wrapper.style.height;
+            wrapper.style.width = '210mm';
+            wrapper.style.height = '297mm';
+        }
+    });
+
+    window.addEventListener('afterprint', () => {
+        const preview = document.getElementById('resume-preview');
+        const wrapper = document.getElementById('resume-wrapper');
+        if (preview && preview.dataset.savedTransform !== undefined) {
+            preview.style.transform = preview.dataset.savedTransform;
+            delete preview.dataset.savedTransform;
+        }
+        if (wrapper && wrapper.dataset.savedWidth !== undefined) {
+            wrapper.style.width = wrapper.dataset.savedWidth;
+            wrapper.style.height = wrapper.dataset.savedHeight;
+            delete wrapper.dataset.savedWidth;
+            delete wrapper.dataset.savedHeight;
+        }
     });
 }
 

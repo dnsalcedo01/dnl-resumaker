@@ -1,4 +1,4 @@
-const CACHE_NAME = 'resumaker-pwa-v5';
+const CACHE_NAME = 'resumaker-pwa-v4';
 const STATIC_ASSETS = [
     './',
     'index.html',
