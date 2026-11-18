@@ -2901,7 +2901,7 @@ function openPdfView() {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rubik:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2.4">
     <style>
         html {
             height: auto !important;
@@ -3024,9 +3024,7 @@ function openPdfView() {
             .pdf-page-container {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 0 !important;
                 width: 210mm !important;
-                height: 297mm !important;
             }
             #resume-preview,
             .resume-page {
@@ -3040,7 +3038,6 @@ function openPdfView() {
                 padding: 12mm 14mm 12mm 14mm !important;
                 box-shadow: none !important;
                 box-sizing: border-box !important;
-                transform: none !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 overflow: hidden !important;
@@ -3416,6 +3413,12 @@ function setupControls() {
             autoFitZoom();
         }, 120);
     });
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            autoFitZoom();
+        }, 200);
+    });
+
     // Native print event handlers to ensure pristine ISO A4 print output without inline scaling interference
     window.addEventListener('beforeprint', () => {
         const preview = document.getElementById('resume-preview');
