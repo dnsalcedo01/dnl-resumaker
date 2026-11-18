@@ -2785,7 +2785,7 @@ body {
 }
 
 /* Responsive adjustment for small screens */
-@media (max-width: 720px) {
+@media screen and (max-width: 720px) {
     .welcome-modal-grid {
         grid-template-columns: 1fr;
     }
