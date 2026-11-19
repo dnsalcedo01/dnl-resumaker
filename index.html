@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://storage.ko-fi.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://storage.ko-fi.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: blob: https://storage.ko-fi.com https://ko-fi.com; frame-src 'self' https://ko-fi.com; connect-src 'self' https://ko-fi.com; object-src 'none'; base-uri 'self';">
     <title>Resu-maker by DNL - Professional IT Resume Builder</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- PWA & Mobile Web Capabilities -->
@@ -453,6 +453,9 @@
             style="display:none; background:#ffffff; color:#0f172a; border:none; padding:3px 9px; border-radius:4px; font-weight:600; font-size:11px; cursor:pointer; margin-left:8px;">Undo</button>
     </div>
 
+    <!-- Ko-fi Overlay Widget Script & Configuration -->
+    <script defer src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+    <script defer src="kofi-config.js?v=2.4"></script>
     <script src="script.js?v=2.4"></script>
 </body>
 

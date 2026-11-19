@@ -1,15 +1,24 @@
 :root {
-    --primary-color: #1c4482;       /* Primary brand navy blue */
-    --secondary-color: #df6a26;     /* Accent warm amber */
-    --text-main: #334155;          /* Primary body slate */
-    --text-heading: #1c4482;       /* Section heading tone */
-    --text-muted: #718096;         /* Secondary / metadata tone */
-    --text-contact: #55606e;       /* Contact metadata tone */
-    --project-bg: #eedeff;         /* Badge highlight background */
-    --project-text: #4a1d96;       /* Badge highlight foreground */
+    --primary-color: #1c4482;
+    /* Primary brand navy blue */
+    --secondary-color: #df6a26;
+    /* Accent warm amber */
+    --text-main: #334155;
+    /* Primary body slate */
+    --text-heading: #1c4482;
+    /* Section heading tone */
+    --text-muted: #718096;
+    /* Secondary / metadata tone */
+    --text-contact: #55606e;
+    /* Contact metadata tone */
+    --project-bg: #eedeff;
+    /* Badge highlight background */
+    --project-text: #4a1d96;
+    /* Badge highlight foreground */
     --editor-bg: #ffffff;
     --border-color: #e2e8f0;
-    --bg-workspace: #3e444e;       /* Canvas workspace background */
+    --bg-workspace: #3e444e;
+    /* Canvas workspace background */
     --font-heading: 'Rubik', sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -304,10 +313,13 @@ body {
 }
 
 @keyframes pulseSaveDot {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
         transform: scale(1);
     }
+
     50% {
         opacity: 0.35;
         transform: scale(0.8);
@@ -384,7 +396,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     overflow: hidden;
     transition: border-color 0.2s;
 }
@@ -476,7 +488,7 @@ body {
     border-radius: 8px;
     object-fit: cover;
     background: #e2e8f0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid #cbd5e1;
     flex-shrink: 0;
 }
@@ -691,7 +703,7 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .pattern-option-thumb svg {
@@ -750,7 +762,7 @@ body {
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     margin-bottom: 9px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     position: relative;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -897,7 +909,7 @@ body {
     justify-content: center;
     font-size: 15px;
     color: var(--secondary-color);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* Form Group & Format Toolbar */
@@ -965,7 +977,7 @@ body {
     color: #ffffff;
 }
 
-.form-group input, 
+.form-group input,
 .form-group textarea {
     padding: 7px 10px;
     border: 1px solid #cbd5e1;
@@ -977,7 +989,7 @@ body {
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.form-group input:focus, 
+.form-group input:focus,
 .form-group textarea:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(28, 68, 130, 0.15);
@@ -1202,6 +1214,7 @@ body {
     --project-bg: #eedeff;
     --project-text: #4a1d96;
 }
+
 .resume-page.theme-navy::before {
     filter: none;
 }
@@ -1216,6 +1229,7 @@ body {
     --project-bg: #dcfce7;
     --project-text: #166534;
 }
+
 .resume-page.theme-emerald::before {
     filter: hue-rotate(302deg) saturate(1.25) brightness(0.95);
 }
@@ -1231,6 +1245,7 @@ body {
     --project-bg: #ffedd5;
     --project-text: #9a3412;
 }
+
 .resume-page.theme-terracotta::before,
 .resume-page.theme-burgundy::before {
     filter: hue-rotate(180deg) saturate(1.5) brightness(1.05);
@@ -1246,13 +1261,14 @@ body {
     --project-bg: #eff6ff;
     --project-text: #1d4ed8;
 }
+
 .resume-page.theme-slate::before {
     filter: grayscale(85%) opacity(0.55);
 }
 
 /* Ensure resume content layers above background pattern */
-.cv-header, 
-.cv-summary-container, 
+.cv-header,
+.cv-summary-container,
 .cv-grid {
     position: relative;
     z-index: 2;
@@ -1274,7 +1290,8 @@ body {
 .cv-name {
     font-family: var(--font-heading);
     font-size: 28px;
-    font-weight: 500; /* Regular/Medium style */
+    font-weight: 500;
+    /* Regular/Medium style */
     color: var(--primary-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1285,7 +1302,8 @@ body {
 .cv-title {
     font-family: var(--font-heading);
     font-size: 16px;
-    font-weight: 400; /* Regular style */
+    font-weight: 400;
+    /* Regular style */
     color: var(--secondary-color);
     margin-bottom: 6px;
 }
@@ -1434,7 +1452,8 @@ body {
 .cv-vol-title {
     font-family: var(--font-heading);
     font-size: 14px;
-    font-weight: 500; /* Regular/Medium */
+    font-weight: 500;
+    /* Regular/Medium */
     color: var(--primary-color);
     line-height: 1.25;
     margin-bottom: 2px;
@@ -1444,7 +1463,8 @@ body {
 .cv-vol-org {
     font-family: var(--font-heading);
     font-size: 12.5px;
-    font-weight: 400; /* Regular */
+    font-weight: 400;
+    /* Regular */
     color: var(--secondary-color);
     margin-bottom: 2px;
 }
@@ -1656,7 +1676,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: -16px; /* Vertical overlay offset */
+    margin-bottom: -16px;
+    /* Vertical overlay offset */
     pointer-events: none;
     background: transparent !important;
     transition: margin-bottom 0.1s ease;
@@ -1667,7 +1688,8 @@ body {
     object-fit: contain;
     display: block;
     background: transparent !important;
-    mix-blend-mode: multiply; /* Alpha blending for ink rendering */
+    mix-blend-mode: multiply;
+    /* Alpha blending for ink rendering */
     pointer-events: auto;
     transition: width 0.1s ease;
     cursor: ew-resize;
@@ -1724,7 +1746,7 @@ body {
    ======================================================== */
 .toast-notification {
     position: fixed;
-    bottom: 20px;
+    bottom: 85px;
     right: 20px;
     background: #10b981;
     color: white;
@@ -1741,8 +1763,35 @@ body {
 }
 
 @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ========================================================
+   KO-FI FLOATING CHAT WIDGET (DESKTOP ONLY)
+   ======================================================== */
+/* Floating trigger button */
+.floatingchat-container-wrap,
+[id^="kofi-wo-container"] {
+    right: 20px !important;
+    bottom: 20px !important;
+    left: unset !important;
+    z-index: 150 !important;
+}
+
+/* Floating popup modal window (floats cleanly above trigger button) */
+.floating-chat-kofi-popup-iframe {
+    right: 20px !important;
+    bottom: 80px !important;
+    left: unset !important;
+    z-index: 151 !important;
 }
 
 /* ========================================================
@@ -1775,7 +1824,7 @@ body {
     border-radius: 12px;
     width: 90%;
     max-width: 580px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
     max-height: calc(100dvh - 32px);
@@ -1881,7 +1930,7 @@ body {
     background: #eff6ff;
     border-color: #93c5fd;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .icon-tile:hover i {
@@ -1934,8 +1983,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ========================================================
@@ -2789,11 +2843,13 @@ body {
     .welcome-modal-grid {
         grid-template-columns: 1fr;
     }
+
     .welcome-info-col {
         border-right: none;
         border-bottom: 1px solid #e2e8f0;
         padding: 20px 18px 14px 18px;
     }
+
     .welcome-actions-col {
         padding: 16px 18px 24px 18px;
     }
@@ -2811,13 +2867,16 @@ body {
         width: 380px;
         min-width: 320px;
     }
+
     .preview-panel {
         padding: 10px 10px 35px 10px;
     }
+
     .preview-toolbar {
         gap: 8px;
         padding: 4px 12px;
     }
+
     .preview-hint .hint-save-text {
         display: none;
     }
@@ -2827,9 +2886,11 @@ body {
     .paper-badge .paper-dims {
         display: none;
     }
+
     .preview-hint {
         display: none;
     }
+
     .editor-panel {
         width: 350px;
         min-width: 300px;
@@ -2915,6 +2976,24 @@ body {
         height: 100%;
         box-shadow: none;
     }
+
+    .toast-notification {
+        bottom: 20px;
+    }
+
+    /* Strictly hide Ko-fi floating widget on mobile & tablet screens */
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi,
+    .floating-chat-kofi-popup-iframe,
+    .floating-chat-kofi-popup-iframe-mobi,
+    .floating-chat-kofi-popup-iframe-closer-mobi,
+    [id^="kofi-wo-container"],
+    [id^="kofi-widget-overlay"] {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
 }
 
 /* ========================================================
@@ -2926,7 +3005,8 @@ body {
         margin: 0 !important;
     }
 
-    html, body {
+    html,
+    body {
         width: 210mm !important;
         height: 297mm !important;
         background: #ffffff !important;
@@ -2943,7 +3023,13 @@ body {
     .tablet-view-switcher,
     .hide-on-print,
     .modal-backdrop,
-    .toast-notification {
+    .toast-notification,
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi,
+    .floating-chat-kofi-popup-iframe,
+    .floating-chat-kofi-popup-iframe-mobi,
+    [id^="kofi-wo-container"],
+    [id^="kofi-widget-overlay"] {
         display: none !important;
     }
 
