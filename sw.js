@@ -4,6 +4,7 @@ const STATIC_ASSETS = [
     'index.html',
     'styles.css',
     'script.js',
+    'kofi-config.js',
     'manifest.json',
     'favicon.svg',
     'icon-192.png',
